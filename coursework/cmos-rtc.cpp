@@ -27,6 +27,7 @@ public:
 	 */
 	void read_timepoint(RTCTimePoint& tp) override
 	{
+		syslog.messagef(LogLevel::DEBUG, "WOOOO HOOOOOOOOOOO");
 		tp.seconds = 1;
 		tp.minutes = 1; 
 		tp.hours=1; 
