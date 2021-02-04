@@ -7,7 +7,9 @@
  * STUDENT NUMBER: s1885517
  */
 #include <infos/drivers/timer/rtc.h>
+#include <infos/kernel/log.h>
 
+using namespace infos::kernel;
 using namespace infos::drivers;
 using namespace infos::drivers::timer;
 
@@ -27,7 +29,7 @@ public:
 	 */
 	void read_timepoint(RTCTimePoint& tp) override
 	{
-		syslog.messagef("WOOOO HOOOOOOOOOOO");
+		syslog.messagef(LogLevel::DEBUG, "WOOOO HOOOOOOOOOOO");
 		tp.seconds = 1;
 		tp.minutes = 1; 
 		tp.hours=1; 
