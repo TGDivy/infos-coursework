@@ -73,7 +73,7 @@ public:
 			year = (year & 0x0F) + ((year / 16) * 10);
 		}
 
-		void from12to24(){
+		void from_12_to_24_hourclock(){
 			hour = ((hour & 0x7F) + 12) % 24;
 		}
 
@@ -115,7 +115,7 @@ public:
 
 		// Convert 12 hour clock to 24 hour clock if necessary
 		if (!(registerB & 0x02) && (current_time.hour & 0x80)) {
-			current_time.from12to24hour()
+			current_time.from_12_to_24_hourclock()
 		}
 	}
 
