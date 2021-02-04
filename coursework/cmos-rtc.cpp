@@ -37,6 +37,16 @@ public:
 		cmos_data    = 0x71
 	};
 
+	int get_update_in_progress_flag() {
+		__outb(cmos_address, 0x0A);
+		return (__inb(cmos_data) & 0x80);
+	}
+	
+	unsigned char get_RTC_register(int reg) {
+		__outb(cmos_address, reg);
+		return __inb(cmos_data);
+	}
+
 	struct time {
 		unsigned char second;
 		unsigned char minute;
@@ -54,36 +64,26 @@ public:
 					year == t1.year;
 		}
 
+		void read_registers(){
+			second = get_RTC_register(0x00);
+			minute = get_RTC_register(0x02);
+			hour = get_RTC_register(0x04);
+			day = get_RTC_register(0x07);
+			month = get_RTC_register(0x08);
+			year = get_RTC_register(0x09);
+		}
+
+		void BCD_to_binary(){
+			second = (second & 0x0F) + ((second / 16) * 10);
+			minute = (minute & 0x0F) + ((minute / 16) * 10);
+			hour = ( (hour & 0x0F) + (((hour & 0x70) / 16) * 10) ) | (hour & 0x80);
+			day = (day & 0x0F) + ((day / 16) * 10);
+			month = (month & 0x0F) + ((month / 16) * 10);
+			year = (year & 0x0F) + ((year / 16) * 10);
+		}
+
 	} current_time; 
 	
-	int get_update_in_progress_flag() {
-		__outb(cmos_address, 0x0A);
-		return (__inb(cmos_data) & 0x80);
-	}
-	
-	unsigned char get_RTC_register(int reg) {
-		__outb(cmos_address, reg);
-		return __inb(cmos_data);
-	}
-
-	void read_registers(time &t){
-		t.second = get_RTC_register(0x00);
-		t.minute = get_RTC_register(0x02);
-		t.hour = get_RTC_register(0x04);
-		t.day = get_RTC_register(0x07);
-		t.month = get_RTC_register(0x08);
-		t.year = get_RTC_register(0x09);
-	}
-
-	void BCD_to_binary(time &t){
-		t.second = (t.second & 0x0F) + ((t.second / 16) * 10);
-		t.minute = (t.minute & 0x0F) + ((t.minute / 16) * 10);
-		t.hour = ( (t.hour & 0x0F) + (((t.hour & 0x70) / 16) * 10) ) | (t.hour & 0x80);
-		t.day = (t.day & 0x0F) + ((t.day / 16) * 10);
-		t.month = (t.month & 0x0F) + ((t.month / 16) * 10);
-		t.year = (t.year & 0x0F) + ((t.year / 16) * 10);
-	}
-
 	void read_rtc() {
 		time last_time;
 		unsigned char registerB;
@@ -92,13 +92,13 @@ public:
 		//       to avoid getting dodgy/inconsistent values due to RTC updates
 	
 		while (get_update_in_progress_flag());                // Make sure an update isn't in progress
-		read_registers(current_time);
+		current_time.read_registers();
 
 		do {
 			last_time = current_time;
 
 			while (get_update_in_progress_flag());           // Make sure an update isn't in progress
-			read_registers(current_time);
+			current_time.read_registers();
 
 		} while(!(last_time==current_time));
 	
@@ -106,11 +106,10 @@ public:
 	
 		// Convert BCD to binary values if necessary
 		if (!(registerB & 0x04)) {
-			BCD_to_binary(current_time);
+			current_time.BCD_to_binary();
 		}
-	
+
 		// Convert 12 hour clock to 24 hour clock if necessary
-	
 		if (!(registerB & 0x02) && (current_time.hour & 0x80)) {
 			current_time.hour = ((current_time.hour & 0x7F) + 12) % 24;
 		}
@@ -132,10 +131,10 @@ public:
 		read_rtc();
 		tp.seconds = current_time.second;
 		tp.minutes = current_time.minute; 
-		tp.hours=current_time.hour; 
-		tp.day_of_month=current_time.day; 
-		tp.month=current_time.month;
-		tp.year=current_time.year;
+		tp.hours = current_time.hour; 
+		tp.day_of_month = current_time.day; 
+		tp.month = current_time.month;
+		tp.year = current_time.year;
 	}
 };
 
