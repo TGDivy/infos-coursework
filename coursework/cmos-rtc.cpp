@@ -46,13 +46,13 @@ public:
 		unsigned char month;
 		unsigned int year;
 
-		bool operator ==(const time& t1, const time& t2) {
-			return 	t1.seconnd == t2.seconnd && 
-					t1.minute == t2.minute &&
-					t1.hour == t2.hour &&
-					t1.day == t2.day &&
-					t1.month == t2.month &&
-					t1.year == t2.year;
+		bool operator==(const time& t1) {
+			return 	second == t1.second && 
+					minute == t1.minute &&
+					hour == t1.hour &&
+					day == t1.day &&
+					month == t1.month &&
+					year == t1.year;
 		}
 
 	} current_time; 
@@ -112,7 +112,7 @@ public:
 	
 		// Convert 12 hour clock to 24 hour clock if necessary
 	
-		if (!(registerB & 0x02) && (hour & 0x80)) {
+		if (!(registerB & 0x02) && (current_time.hour & 0x80)) {
 			current_time.hour = ((current_time.hour & 0x7F) + 12) % 24;
 		}	 	
 	}
