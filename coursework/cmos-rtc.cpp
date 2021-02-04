@@ -32,18 +32,30 @@ class CMOSRTC : public RTC {
 public:
 	static const DeviceClass CMOSRTCDeviceClass;
 
-	unsigned char second;
-	unsigned char minute;
-	unsigned char hour;
-	unsigned char day;
-	unsigned char month;
-	unsigned int year;
-
+	
 	enum {
 		cmos_address = 0x70,
 		cmos_data    = 0x71
 	};
 
+	struct time {
+		unsigned char second;
+		unsigned char minute;
+		unsigned char hour;
+		unsigned char day;
+		unsigned char month;
+		unsigned int year;
+
+		bool operator ==(const time& t1, const time& t2) {
+			return 	t1.seconnd == t2.seconnd && 
+					t1.minute == t2.minute &&
+					t1.hour == t2.hour &&
+					t1.day == t2.day &&
+					t1.month == t2.month &&
+					t1.year == t2.year;
+		}
+
+	} current_time; 
 	
 	int get_update_in_progress_flag() {
 		__outb(cmos_address, 0x0A);
@@ -55,39 +67,54 @@ public:
 		return __inb(cmos_data);
 	}
 
-	void read_rtc(RTCTimePoint& tp) {
+	void read_registers(time t){
+		t.second = get_RTC_register(0x00);
+		t.minute = get_RTC_register(0x02);
+		t.hour = get_RTC_register(0x04);
+		t.day = get_RTC_register(0x07);
+		t.month = get_RTC_register(0x08);
+		t.year = get_RTC_register(0x09);
+	}
+
+	void BCD_to_binary(time t){
+		t.second = (t.second & 0x0F) + ((t.second / 16) * 10);
+		t.minute = (t.minute & 0x0F) + ((t.minute / 16) * 10);
+		t.hour = ( (t.hour & 0x0F) + (((t.hour & 0x70) / 16) * 10) ) | (t.hour & 0x80);
+		t.day = (t.day & 0x0F) + ((t.day / 16) * 10);
+		t.month = (t.month & 0x0F) + ((t.month / 16) * 10);
+		t.year = (t.year & 0x0F) + ((t.year / 16) * 10);
+	}
+
+	void read_rtc() {
+		time last_time;
 		unsigned char registerB;
+	
+		// Note: This uses the "read registers until you get the same values twice in a row" technique
+		//       to avoid getting dodgy/inconsistent values due to RTC updates
+	
+		while (get_update_in_progress_flag());                // Make sure an update isn't in progress
+		read_registers(current_time);
 
+		do {
+			last_time = current_time;
+
+			while (get_update_in_progress_flag());           // Make sure an update isn't in progress
+			read_registers(current_time);
+
+		} while(!(last_time==current_time));
+	
 		registerB = get_RTC_register(0x0B);
-
-		second = get_RTC_register(0x00);
-		minute = get_RTC_register(0x02);
-		hour = get_RTC_register(0x04);
-		day = get_RTC_register(0x07);
-		month = get_RTC_register(0x08);
-		year = get_RTC_register(0x09);
-			
+	
+		// Convert BCD to binary values if necessary
 		if (!(registerB & 0x04)) {
-            second = (second & 0x0F) + ((second / 16) * 10);
-            minute = (minute & 0x0F) + ((minute / 16) * 10);
-            hour = ( (hour & 0x0F) + (((hour & 0x70) / 16) * 10) ) | (hour & 0x80);
-            day = (day & 0x0F) + ((day / 16) * 10);
-            month = (month & 0x0F) + ((month / 16) * 10);
-            year = (year & 0x0F) + ((year / 16) * 10);
-    	}
-
-	    if (!(registerB & 0x02) && (hour & 0x80)) {
-            hour = ((hour & 0x7F) + 12) % 24;
-      	}
- 
-		tp.seconds = second;
-		tp.minutes = minute; 
-		tp.hours=hour; 
-		tp.day_of_month=day; 
-		tp.month=month;
-		tp.year=year;
-
-		while (get_update_in_progress_flag()); 	
+			BCD_to_binary(current_time);
+		}
+	
+		// Convert 12 hour clock to 24 hour clock if necessary
+	
+		if (!(registerB & 0x02) && (hour & 0x80)) {
+			current_time.hour = ((current_time.hour & 0x7F) + 12) % 24;
+		}	 	
 	}
 
 	const DeviceClass& device_class() const override
@@ -103,7 +130,13 @@ public:
 	void read_timepoint(RTCTimePoint& tp) override
 	{
 		UniqueIRQLock();
-		read_rtc(tp);
+		read_rtc();
+		tp.seconds = current_time.second;
+		tp.minutes = current_time.minute; 
+		tp.hours=current_time.hour; 
+		tp.day_of_month=current_time.day; 
+		tp.month=current_time.month;
+		tp.year=current_time.year;
 	}
 };
 
