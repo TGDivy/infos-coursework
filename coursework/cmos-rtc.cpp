@@ -45,7 +45,7 @@ public:
 		unsigned char month;
 		unsigned int year;
 
-		bool operator==(const time& t1) {
+		bool operator==(const time &t1) {
 			return 	second == t1.second && 
 					minute == t1.minute &&
 					hour == t1.hour &&
@@ -66,7 +66,7 @@ public:
 		return __inb(cmos_data);
 	}
 
-	void read_registers(time *t){
+	void read_registers(time &t){
 		t.second = get_RTC_register(0x00);
 		t.minute = get_RTC_register(0x02);
 		t.hour = get_RTC_register(0x04);
@@ -75,7 +75,7 @@ public:
 		t.year = get_RTC_register(0x09);
 	}
 
-	void BCD_to_binary(time *t){
+	void BCD_to_binary(time &t){
 		t.second = (t.second & 0x0F) + ((t.second / 16) * 10);
 		t.minute = (t.minute & 0x0F) + ((t.minute / 16) * 10);
 		t.hour = ( (t.hour & 0x0F) + (((t.hour & 0x70) / 16) * 10) ) | (t.hour & 0x80);
@@ -92,13 +92,13 @@ public:
 		//       to avoid getting dodgy/inconsistent values due to RTC updates
 	
 		while (get_update_in_progress_flag());                // Make sure an update isn't in progress
-		read_registers(&current_time);
+		read_registers(current_time);
 
 		do {
 			last_time = current_time;
 
 			while (get_update_in_progress_flag());           // Make sure an update isn't in progress
-			read_registers(&current_time);
+			read_registers(current_time);
 
 		} while(!(last_time==current_time));
 	
@@ -106,7 +106,7 @@ public:
 	
 		// Convert BCD to binary values if necessary
 		if (!(registerB & 0x04)) {
-			BCD_to_binary(&current_time);
+			BCD_to_binary(current_time);
 		}
 	
 		// Convert 12 hour clock to 24 hour clock if necessary
