@@ -64,15 +64,6 @@ public:
 					year == t1.year;
 		}
 
-		void read_registers(){
-			second = get_RTC_register(0x00);
-			minute = get_RTC_register(0x02);
-			hour = get_RTC_register(0x04);
-			day = get_RTC_register(0x07);
-			month = get_RTC_register(0x08);
-			year = get_RTC_register(0x09);
-		}
-
 		void BCD_to_binary(){
 			second = (second & 0x0F) + ((second / 16) * 10);
 			minute = (minute & 0x0F) + ((minute / 16) * 10);
@@ -82,8 +73,21 @@ public:
 			year = (year & 0x0F) + ((year / 16) * 10);
 		}
 
+		void from12to24(){
+			hour = ((hour & 0x7F) + 12) % 24;
+		}
+
 	} current_time; 
-	
+
+	void read_registers(time &t){
+		t.second = get_RTC_register(0x00);
+		t.minute = get_RTC_register(0x02);
+		t.hour = get_RTC_register(0x04);
+		t.day = get_RTC_register(0x07);
+		t.month = get_RTC_register(0x08);
+		t.year = get_RTC_register(0x09);
+	}
+
 	void read_rtc() {
 		time last_time;
 		unsigned char registerB;
@@ -92,13 +96,13 @@ public:
 		//       to avoid getting dodgy/inconsistent values due to RTC updates
 	
 		while (get_update_in_progress_flag());                // Make sure an update isn't in progress
-		current_time.read_registers();
+		read_registers(current_time);
 
 		do {
 			last_time = current_time;
 
 			while (get_update_in_progress_flag());           // Make sure an update isn't in progress
-			current_time.read_registers();
+			read_registers(current_time);
 
 		} while(!(last_time==current_time));
 	
@@ -111,7 +115,7 @@ public:
 
 		// Convert 12 hour clock to 24 hour clock if necessary
 		if (!(registerB & 0x02) && (current_time.hour & 0x80)) {
-			current_time.hour = ((current_time.hour & 0x7F) + 12) % 24;
+			current_time.from12to24hour()
 		}
 	}
 
