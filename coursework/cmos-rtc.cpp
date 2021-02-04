@@ -4,7 +4,7 @@
  */
 
 /*
- * STUDENT NUMBER: s
+ * STUDENT NUMBER: s1885517
  */
 #include <infos/drivers/timer/rtc.h>
 
