@@ -27,6 +27,12 @@ public:
 	 */
 	void read_timepoint(RTCTimePoint& tp) override
 	{
+		tp.seconds = 1;
+		tp.minutes = 1; 
+		tp.hours=1; 
+		tp.day_of_month=1; 
+		tp.month=1; 
+		tp.year=1;
 		// FILL IN THIS METHOD - WRITE HELPER METHODS IF NECESSARY
 	}
 };
