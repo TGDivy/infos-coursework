@@ -103,18 +103,7 @@ public:
 	void read_timepoint(RTCTimePoint& tp) override
 	{
 		UniqueIRQLock();
-
-		__outb(0x70, 0x00); // Activate offset 3
-		uint8_t v = __inb(0x71); // Read data	
-		
-		syslog.messagef(LogLevel::DEBUG, "WOOOO HOOOOOOOOOOO %d",v);
-		tp.seconds = 1;
-		tp.minutes = 1; 
-		tp.hours=1; 
-		tp.day_of_month=1; 
-		tp.month=1;
-		tp.year=1;
-		// FILL IN THIS METHOD - WRITE HELPER METHODS IF NECESSARY
+		read_rtc(tp);
 	}
 };
 
