@@ -115,7 +115,7 @@ public:
 
 		// Convert 12 hour clock to 24 hour clock if necessary
 		if (!(registerB & 0x02) && (current_time.hour & 0x80)) {
-			current_time.from_12_to_24_hourclock()
+			current_time.from_12_to_24_hourclock();
 		}
 	}
 
