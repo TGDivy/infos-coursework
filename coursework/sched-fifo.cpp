@@ -43,7 +43,7 @@ public:
 	void remove_from_runqueue(SchedulingEntity& entity) override
 	{
 		UniqueIRQLock l;
-		runqueue.enqueue(&entity);
+		runqueue.remove(&entity);
 	}
 
 	/**
@@ -59,8 +59,8 @@ public:
 		SchedulingEntity::EntityRuntime min_runtime = 0;
 		SchedulingEntity *min_runtime_entity = NULL;
 		for (const auto& entity : runqueue) {
-			// sched_log.messagef(LogLevel::DEBUG, "Nooooooooo");
-			// sched_log.messagef(LogLevel::DEBUG, "Value is %p", entity);
+			sched_log.messagef(LogLevel::DEBUG, "Nooooooooo");
+			sched_log.messagef(LogLevel::DEBUG, "Value is %p", entity);
 			if (min_runtime_entity == NULL || entity->cpu_runtime() < min_runtime) {
 				min_runtime_entity = entity;
 				min_runtime = entity->cpu_runtime();
