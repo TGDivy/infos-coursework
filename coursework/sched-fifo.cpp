@@ -53,7 +53,10 @@ public:
 	 */
 	SchedulingEntity *pick_next_entity() override
 	{
-		return runqueue.first();
+		if (runqueue.count() == 0) return NULL;
+		if (runqueue.count() >= 1) return runqueue.first();
+		
+		// return runqueue.first();
 	}
 
 private:
