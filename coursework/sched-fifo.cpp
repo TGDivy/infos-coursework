@@ -42,7 +42,8 @@ public:
 	 */
 	void remove_from_runqueue(SchedulingEntity& entity) override
 	{
-		
+		UniqueIRQLock l;
+		runqueue.enqueue(&entity);
 	}
 
 	/**
