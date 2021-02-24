@@ -58,6 +58,7 @@ public:
 		
 		SchedulingEntity::EntityRuntime min_runtime = 0;
 		SchedulingEntity *min_runtime_entity = NULL;
+		
 		for (const auto& entity : runqueue) {
 			if (min_runtime_entity == NULL || entity->cpu_runtime() < min_runtime) {
 				min_runtime_entity = entity;

@@ -32,7 +32,8 @@ public:
 	 */
 	void add_to_runqueue(SchedulingEntity& entity) override
 	{
-		not_implemented();
+		UniqueIRQLock l;
+		runqueue.enqueue(&entity);
 	}
 
 	/**
@@ -41,7 +42,7 @@ public:
 	 */
 	void remove_from_runqueue(SchedulingEntity& entity) override
 	{
-		not_implemented();
+		
 	}
 
 	/**
@@ -51,7 +52,7 @@ public:
 	 */
 	SchedulingEntity *pick_next_entity() override
 	{
-		not_implemented();
+		return runqueue.first();
 	}
 
 private:
