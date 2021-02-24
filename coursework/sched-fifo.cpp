@@ -56,13 +56,11 @@ public:
 		if (runqueue.count() == 0) return NULL;
 		if (runqueue.count() == 1) return runqueue.first();
 
-
-
 		SchedulingEntity::EntityRuntime min_runtime = 0;
 		SchedulingEntity *min_runtime_entity = NULL;
 		for (const auto& entity : runqueue) {
-			sched_log.messagef(LogLevel::DEBUG, "Nooooooooo");
-			sched_log.messagef(LogLevel::DEBUG, "Value is %p", entity);
+			// sched_log.messagef(LogLevel::DEBUG, "Nooooooooo");
+			// sched_log.messagef(LogLevel::DEBUG, "Value is %p", entity);
 			if (min_runtime_entity == NULL || entity->cpu_runtime() < min_runtime) {
 				min_runtime_entity = entity;
 				min_runtime = entity->cpu_runtime();
