@@ -58,8 +58,11 @@ public:
 		if (runqueue.count() == 0)
 			return NULL; 
 		// otherwise just return the first task to be run.
-		else
+		else {
+			syslog.messagef(LogLevel::DEBUG, "Number of processes in que %d", runqueue.count());
 			return runqueue.first();
+		}
+			
 		// Always return the first task in the que, until it has been completed, or cannot be run.
 		// This would imply that it's always the same task that is returned, unless it's no longer in the que, 
 		// i.e. removed by the remove from runque function.
