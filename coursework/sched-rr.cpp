@@ -54,19 +54,11 @@ public:
 	SchedulingEntity *pick_next_entity() override
 	{
 		if (runqueue.count() == 0) return NULL;
-		if (runqueue.count() == 1) return runqueue.first();
-		
-		SchedulingEntity::EntityRuntime min_runtime = 0;
-		SchedulingEntity *min_runtime_entity = NULL;
-		
-		for (const auto& entity : runqueue) {
-			if (min_runtime_entity == NULL || entity->cpu_runtime() < min_runtime) {
-				min_runtime_entity = entity;
-				min_runtime = entity->cpu_runtime();
-			}
+		if (runqueue.count() >= 1) {
+			const auto& entity = runqueue.pop();
+			runqueue.append(entity);
+			return entity;
 		}
-				
-		return min_runtime_entity;
 	}
 
 private:
