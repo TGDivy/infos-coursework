@@ -56,7 +56,7 @@ public:
 		if (runqueue.count() == 0) return NULL;
 		if (runqueue.count() >= 1) {
 			const auto& entity = runqueue.pop();
-			syslog.messagef(LogLevel::DEBUG, "Execution time %f", entity->cpu_runtime());
+			syslog.messagef(LogLevel::DEBUG, "Execution time %d", entity->cpu_runtime());
 			runqueue.append(entity);
 			return entity;
 		}
