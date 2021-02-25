@@ -53,8 +53,19 @@ public:
 	 */
 	SchedulingEntity *pick_next_entity() override
 	{
-		if (runqueue.count() == 0) return NULL;
-		if (runqueue.count() >= 1) return runqueue.first();
+		// If there is no process running there is nothing to return
+		if (runqueue.count() == 0)
+			return NULL; 
+		// otherwise just return the first task to be run.
+		else 
+			return runqueue.pop();
+		// Always return the first task in the que, until it is no longer runnable/running. 
+		// I.e. goes to sleep or is completed.
+
+		// Similarly, due to this nature, it will always wait for a given task to complete.
+		// When a task runs infinetly, it has no choice but to be stuck there.
+		// hence, for the sched 2 test.
+		
 	}
 
 private:
