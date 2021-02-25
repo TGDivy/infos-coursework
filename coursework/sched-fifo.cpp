@@ -53,12 +53,13 @@ public:
 	 */
 	SchedulingEntity *pick_next_entity() override
 	{
+		syslog.messagef(LogLevel::DEBUG, "Execution time %d", runqueue.count());
 		// If there is no process running there is nothing to return
 		if (runqueue.count() == 0)
 			return NULL; 
 		// otherwise just return the first task to be run.
-		else 
-			return runqueue.pop();
+		else 		
+			return runqueue.first();
 		// Always return the first task in the que, until it is no longer runnable/running. 
 		// I.e. goes to sleep or is completed.
 

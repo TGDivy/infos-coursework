@@ -53,6 +53,7 @@ public:
 	 */
 	SchedulingEntity *pick_next_entity() override
 	{
+		UniqueIRQLock l;
 		if (runqueue.count() == 0) return NULL;
 		if (runqueue.count() >= 1) {
 			const auto& entity = runqueue.pop();
