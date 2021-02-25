@@ -60,6 +60,8 @@ public:
 			runqueue.append(entity);
 			return entity;
 		}
+		// It should never reach here.
+		return NULL;
 	}
 
 private:
