@@ -53,16 +53,17 @@ public:
 	 */
 	SchedulingEntity *pick_next_entity() override
 	{
-		UniqueIRQLock l;
-		if (runqueue.count() == 0) return NULL;
-		if (runqueue.count() >= 1) {
-			const auto& entity = runqueue.pop();
-			syslog.messagef(LogLevel::DEBUG, "Execution time %d", entity->cpu_runtime());
-			runqueue.append(entity);
-			return entity;
+		syslog.messagef(LogLevel::DEBUG, "Number of processes in que %d", runqueue.count());
+		UniqueIRQLock l; // We will maniuplate the run que list.
+		// if List is empty, nothing to return.
+		if (runqueue.count() <= 0) 
+			return NULL;
+		else {
+			const auto& entity = runqueue.pop(); // Get the first process.
+			// syslog.messagef(LogLevel::DEBUG, "Execution time %d", entity->cpu_runtime());
+			runqueue.append(entity); // Put this process at the back of the runque so others can be run as well. 
+			return entity; // Return the first process.
 		}
-		// It should never reach here.
-		return NULL;
 	}
 
 private:

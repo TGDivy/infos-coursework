@@ -53,19 +53,25 @@ public:
 	 */
 	SchedulingEntity *pick_next_entity() override
 	{
-		syslog.messagef(LogLevel::DEBUG, "Execution time %d", runqueue.count());
+		// syslog.messagef(LogLevel::DEBUG, "Number of processes in que %d", runqueue.count());
 		// If there is no process running there is nothing to return
 		if (runqueue.count() == 0)
 			return NULL; 
 		// otherwise just return the first task to be run.
-		else 		
+		else
 			return runqueue.first();
-		// Always return the first task in the que, until it is no longer runnable/running. 
-		// I.e. goes to sleep or is completed.
+		// Always return the first task in the que, until it has been completed, or cannot be run.
+		// This would imply that it's always the same task that is returned, unless it's no longer in the que, 
+		// i.e. removed by the remove from runque function.
 
-		// Similarly, due to this nature, it will always wait for a given task to complete.
+		// This makes it always wait for a given task to complete.
 		// When a task runs infinetly, it has no choice but to be stuck there.
-		// hence, for the sched 2 test.
+		// hence, for the sched 2 test, this is what happens causing it to always be running the ticker 1.
+		// Similarly, as it is always focused on this process it can no longer register for the "\n" or enter key
+		// as that would require engaging with a differet process, and the variable terminate is always false.
+
+		// The reason round robin can terminate is it cycles between all the runable/ running tasks, eventually 
+		// registering the "\n".
 		
 	}
 
