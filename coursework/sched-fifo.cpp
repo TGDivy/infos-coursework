@@ -59,7 +59,8 @@ public:
 			return NULL; 
 		// otherwise just return the first task to be run.
 		else {
-			syslog.messagef(LogLevel::DEBUG, "Number of processes in que %d", runqueue.count());
+			// Uncomment the below comment to observer how the processess build up and are tackled.
+			// syslog.messagef(LogLevel::DEBUG, "Number of processes in que %d", runqueue.count());
 			return runqueue.first();
 		}
 			
@@ -69,13 +70,15 @@ public:
 
 		// This makes it always wait for a given task to complete.
 		// When a task runs infinetly, it has no choice but to be stuck there.
-		// hence, for the sched 2 test, this is what happens causing it to always be running the ticker 1.
-		// Similarly, as it is always focused on this process it can no longer register for the "\n" or enter key
-		// as that would require engaging with a differet process, and the variable terminate is always false.
 
-		// The reason round robin can terminate is it cycles between all the runable/ running tasks, eventually 
-		// registering the "\n".
-		
+		// ********************************
+		// Bonus question
+		// For the sched 2 test, this as the task 1 is non terminating, it gets keeps running it.
+		// Even when press enter, it cannot register the "\n" as this initates a 3rd process.
+		// However, as it is still looking at the first process, the 1.5 second ticker, it cannot register this,
+		// causing it to never move on to the 2nd ticker process, or the 3rd process of registering keyboard input.
+		// Similarly, as the first process is never going to end, the join_thread function never completes, making,
+		// be stuck on the first process.
 	}
 
 private:
