@@ -110,6 +110,9 @@ private:
 
 		pgd->next_free = *slot;
 		*slot = pgd;
+		syslog.messagef(LogLevel::DEBUG, "Actually inserting main at %d, %d", pgd->next_free, *slot);
+
+		
 		
 		// Return the insert point (i.e. slot)
 		return slot;
