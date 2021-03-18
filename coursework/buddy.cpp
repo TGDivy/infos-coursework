@@ -287,7 +287,7 @@ public:
 			while (*slot && pfn_pgd>=pfn_slot && pfn_pgd<(pfn_slot+per_block)) {
 				slot = &(*slot)->next_free;
 				pfn_slot = sys.mm().pgalloc().pgd_to_pfn(*slot);	
-				syslog.messagef(LogLevel::DEBUG, "tell meee %d, %d, %d", per_block, pfn_slot, pfn_to_pgd);
+				syslog.messagef(LogLevel::DEBUG, "tell meee %d, %d, %d", per_block, pfn_slot, pfn_pgd);
 			}
 			if(*slot!=NULL && order == 0){
 				if(*slot == pgd){
