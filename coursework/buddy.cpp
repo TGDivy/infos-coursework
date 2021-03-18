@@ -317,6 +317,7 @@ public:
 				}
 			}
 			else if(slot!=NULL) {
+				syslog.messagef(LogLevel::DEBUG, "slot %d, addres of slot order %d", slot, &slot);
 				split_block(&slot, order);
 				return helper_reserve(order-1, pgd);
 			}
