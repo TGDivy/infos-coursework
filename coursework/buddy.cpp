@@ -296,25 +296,24 @@ public:
 			return false;
 		}
 		if(_free_areas[order]!=NULL){
-			PageDescriptor **slot = &_free_areas[order];
-			// PageDescriptor *buddy = buddy_of(*slot, order);
+			PageDescriptor *slot = _free_areas[order];
 			uint64_t per_block = pages_per_block(order);
-			pfn_t pfn_slot = sys.mm().pgalloc().pgd_to_pfn(*slot);
+			pfn_t pfn_slot = sys.mm().pgalloc().pgd_to_pfn(slot);
 			pfn_t pfn_pgd = sys.mm().pgalloc().pgd_to_pfn(pgd);
 			syslog.messagef(LogLevel::DEBUG, "tell meee order %d, %d, %d, %d", order, per_block, pfn_slot, pfn_pgd);
-			while (*slot && !(pfn_pgd>=pfn_slot && pfn_pgd<(pfn_slot+per_block))) {
-				slot = &(*slot)->next_free;
-				pfn_slot = sys.mm().pgalloc().pgd_to_pfn(*slot);
+			while (slot && !(pfn_pgd>=pfn_slot && pfn_pgd<(pfn_slot+per_block))) {
+				slot = slot->next_free;
+				pfn_slot = sys.mm().pgalloc().pgd_to_pfn(slot);
 				syslog.messagef(LogLevel::DEBUG, "tell meee %d, %d, %d", per_block, pfn_slot, pfn_pgd);
 			}
-			if(*slot!=NULL && order == 0){
-				if(*slot == pgd){
-					remove_block(*slot, 0);
+			if(slot!=NULL && order == 0){
+				if(slot == pgd){
+					remove_block(slot, 0);
 					return true;
 				}
 			}
-			else if(*slot!=NULL) {
-				split_block(slot, order);
+			else if(slot!=NULL) {
+				split_block(&slot, order);
 				return helper_reserve(order-1, pgd);
 			}
 			else {
