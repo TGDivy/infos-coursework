@@ -296,7 +296,6 @@ public:
 			uint64_t per_block = pages_per_block(order);
 			pfn_t pfn_slot = sys.mm().pgalloc().pgd_to_pfn(*slot);
 			pfn_t pfn_pgd = sys.mm().pgalloc().pgd_to_pfn(pgd);
-
 			syslog.messagef(LogLevel::DEBUG, "tell meee %d, %d, %d", per_block, pfn_slot, pfn_pgd);
 			while (*slot && !(pfn_pgd>=pfn_slot && pfn_pgd<(pfn_slot+per_block))) {
 				slot = &(*slot)->next_free;
@@ -310,8 +309,7 @@ public:
 				}
 			}
 			else if(*slot!=NULL) {
-				assert(*slot);
-				split_block(slot, order);
+				split_block(*slot, order);
 				return helper_reserve(order-1, pgd);
 			}
 			else {
