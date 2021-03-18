@@ -343,9 +343,9 @@ public:
 	 */
 	bool init(PageDescriptor *page_descriptors, uint64_t nr_page_descriptors) override
 	{
-		mm_log.messagef(LogLevel::DEBUG, "Buddy Allocator Initialising pd=%p, nr=0x%lx, %d", page_descriptors, nr_page_descriptors, page_descriptors[10000]);
-		PageDescriptor *pc = page_descriptors[10];
-		mm_log.messagef(LogLevel::DEBUG, "0 %d, 100 %d, 10000 %d, -10 %d", page_descriptors[0], page_descriptors[100], page_descriptors[10000, pc[-10]]);
+		mm_log.messagef(LogLevel::DEBUG, "Buddy Allocator Initialising pd=%p, nr=0x%lx, %d", page_descriptors, nr_page_descriptors, &page_descriptors[10000]);
+		PageDescriptor *pc = &page_descriptors[10];
+		mm_log.messagef(LogLevel::DEBUG, "0 %d, 100 %d, 10000 %d, -10 %d", &page_descriptors[0], &page_descriptors[100], &page_descriptors[10000, &pc[-10]]);
 
 		// mm_log.messagef(LogLevel::DEBUG, "Whattt");
 		
@@ -353,7 +353,7 @@ public:
 		// to initialise the allocation algorithm.
 		// dump_state();
 		int x = pages_per_block(MAX_ORDER-1)%nr_page_descriptors;
-		syslog.messagef(LogLevel::DEBUG, "slot %d, addres of slot order %d", page_descriptors, &page_descriptors);
+		mm_log.messagef(LogLevel::DEBUG, "slot %d, addres of slot order %d", page_descriptors, &page_descriptors);
 
 		int crash =1/0; 
 		assert(1==0);
