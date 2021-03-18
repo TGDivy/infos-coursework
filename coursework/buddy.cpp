@@ -91,7 +91,7 @@ private:
 	{
 		// Starting from the _free_area array, find the slot in which the page descriptor
 		// should be inserted.
-		PageDescriptor **slot = &_free_areas[order];
+		PageDescriptor *slot = _free_areas[order];
 		
 		// Iterate whilst there is a slot, and whilst the page descriptor pointer is numerically
 		// greater than what the slot is pointing to.
@@ -101,15 +101,15 @@ private:
 		// *slot->next_free = pgd;
 		// *slot.next_free = pgd;
 
-		while (*slot && pgd > *slot) {
-			slot = &(*slot)->next_free;
+		while (slot && pgd > slot) {
+			slot = slot->next_free;
 		}
 		
 		// Insert the page descriptor into the linked list.
 		// (*slot)->next_free = pgd;
 
-		pgd->next_free = *slot;
-		*slot = pgd;
+		pgd->next_free = slot;
+		slot = pgd;
 		syslog.messagef(LogLevel::DEBUG, "Actually inserting main at %d, %d", pgd->next_free, *slot);
 
 		
@@ -136,21 +136,16 @@ private:
 
 		// }
 		
-		while (slot && slot->next_free!=pgd) {
+		while (slot && slot!=pgd) {
 			slot = slot->next_free;
 			syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", slot, pgd);
 
 		}
-
-		slot->next_free = pgd->next_free;
-		pgd->next_free = NULL;
-
 		// // Make sure the block actually exists.  Panic the system if it does not.
-		// assert(slot == pgd);
-		
-		// // Remove the block from the free list.
-		// slot = pgd->next_free;
-		// pgd->next_free = NULL;
+		assert(slot == pgd);
+
+		_free_areas[order] = pgd->next_free;
+		pgd->next_free = NULL;
 	}
 	
 	/**
