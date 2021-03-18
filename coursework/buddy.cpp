@@ -271,6 +271,7 @@ public:
 
 	bool helper_reserve(int order, PageDescriptor *pgd){
 		if (order>=MAX_ORDER){
+			syslog.messagef(LogLevel::DEBUG, "NOOOOOOO %d", order);
 			return false;
 		}
 		if(_free_areas[order]!=NULL){
