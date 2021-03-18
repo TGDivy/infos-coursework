@@ -147,12 +147,12 @@ private:
 		
 		// TODO: Implement this function
 
-		PageDescriptor *buddy_pointer = buddy_of(*block_pointer);
+		PageDescriptor *buddy_pointer = buddy_of(*block_pointer, source_order-1);
 
-		PageDescriptor **block = insert_block(block_pointer, source_order-1);
-		PageDescriptor **buddy = insert_block(buddy_pointer, source_order-1);
+		PageDescriptor **block = insert_block(*block_pointer, source_order-1);
+		PageDescriptor **buddy = insert_block(*buddy_pointer, source_order-1);
 
-		remove_block(block_pointer, source_order);
+		remove_block(*block_pointer, source_order);
 
 		return *block > *buddy ? *buddy : *block;
 	}
@@ -174,13 +174,13 @@ private:
 
 		// TODO: Implement this function
 
-		PageDescriptor *buddy_pointer = buddy_of(*block_pointer);
+		PageDescriptor *buddy_pointer = buddy_of(*block_pointer, source_order);
 		remove_block(*block_pointer, source_order);
-		remove_block(*buddy_pointer, source_order);
+		remove_block(buddy_pointer, source_order);
 
 		// Starting from the _free_area array, iterate until the block has been located in the linked-list.
 		PageDescriptor **slot = &_free_areas[order+1];
-		while (*slot && (block_pointer != *slot || buddy_pointer !=*slot)) {
+		while (*slot && (*block_pointer != *slot || buddy_pointer !=*slot)) {
 			slot = &(*slot)->next_free;
 		}
 		
@@ -208,7 +208,7 @@ public:
 		if (order>=MAX_ORDER){
 			return NULL;
 		}
-		if(free_pages[order]!=NULL){
+		if(_free_areas[order]!=NULL){
 			PageDescriptor **slot = &_free_areas[order];
 			while (&(*slot)->next_free != NULL) {
 				slot = &(*slot)->next_free;
@@ -267,7 +267,7 @@ public:
 		if (order>=MAX_ORDER){
 			return false;
 		}
-		if(free_pages[order]!=NULL){
+		if(_free_areas[order]!=NULL){
 			PageDescriptor **slot = &_free_areas[order];
 			PageDescriptor *buddy = buddy_of(*slot, order);
 
@@ -342,7 +342,6 @@ public:
 			mm_log.messagef(LogLevel::DEBUG, "%s", buffer);
 		}
 	}
-
 	
 private:
 	PageDescriptor *_free_areas[MAX_ORDER];
