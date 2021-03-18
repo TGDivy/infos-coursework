@@ -72,12 +72,12 @@ private:
 		// (3) Calculate the page-frame-number of the buddy of this page.
 		// * If the PFN is aligned to the next order, then the buddy is the next block in THIS order.
 		// * If it's not aligned, then the buddy must be the previous block in THIS order.
-		uint64_t buddy_pfn = is_correct_alignment_for_order(pgd, order + 1) ?
-			sys.mm().pgalloc().pgd_to_pfn(pgd) + pages_per_block(order) : 
-			sys.mm().pgalloc().pgd_to_pfn(pgd) - pages_per_block(order);
+		PageDescriptor *buddy_pfn = is_correct_alignment_for_order(pgd, order + 1) ?
+			&pgd[pages_per_block(order)] : 
+			&pgd[-pages_per_block(order)];
 		
 		// (4) Return the page descriptor associated with the buddy page-frame-number.
-		return sys.mm().pgalloc().pfn_to_pgd(buddy_pfn);
+		return buddy_pfn;
 	}
 	
 	/**
@@ -343,23 +343,23 @@ public:
 	 */
 	bool init(PageDescriptor *page_descriptors, uint64_t nr_page_descriptors) override
 	{
-		mm_log.messagef(LogLevel::DEBUG, "Buddy Allocator Initialising pd=%p, nr=0x%lx, %d", page_descriptors, nr_page_descriptors, &page_descriptors[10000]);
-		PageDescriptor *pc = &page_descriptors[10];
-		mm_log.messagef(LogLevel::DEBUG, "0 %d, 100 %d, 10000 %d, -10 %d", &page_descriptors[0], &page_descriptors[100], &page_descriptors[10000], &pc[-10]);
+		// mm_log.messagef(LogLevel::DEBUG, "Buddy Allocator Initialising pd=%p, nr=0x%lx, %d", page_descriptors, nr_page_descriptors, &page_descriptors[10000]);
+		// PageDescriptor *pc = &page_descriptors[10];
+		// mm_log.messagef(LogLevel::DEBUG, "0 %d, 100 %d, 10000 %d, -10 %d", &page_descriptors[0], &page_descriptors[100], &page_descriptors[10000], &pc[-10]);
 
-		// mm_log.messagef(LogLevel::DEBUG, "Whattt");
+		// // mm_log.messagef(LogLevel::DEBUG, "Whattt");
 		
-		// TODO: Initialise the free area linked list for the maximum order
-		// to initialise the allocation algorithm.
-		// dump_state();
-		int x = pages_per_block(MAX_ORDER-1)%nr_page_descriptors;
-		mm_log.messagef(LogLevel::DEBUG, "slot %d, addres of slot order %d", page_descriptors, &page_descriptors);
+		// // TODO: Initialise the free area linked list for the maximum order
+		// // to initialise the allocation algorithm.
+		// // dump_state();
+		// int x = pages_per_block(MAX_ORDER-1)%nr_page_descriptors;
+		// mm_log.messagef(LogLevel::DEBUG, "slot %d, addres of slot order %d", page_descriptors, &page_descriptors);
 
-		int crash =1/0; 
-		assert(1==0);
-		assert(1==1);
+		// int crash =1/0; 
+		// assert(1==0);
+		// assert(1==1);
 
-		_free_areas[MAX_ORDER-1] = page_descriptors;
+		_free_areas[MAX_ORDER-1] = &page_descriptors[0];
 		// for(int i =0; i<x;i++){
 		// 	PageDescriptor *p = page_descriptors << 12;
 		// 	insert_block(p, MAX_ORDER-1);
