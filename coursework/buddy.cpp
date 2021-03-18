@@ -160,6 +160,7 @@ private:
 		// TODO: Implement this function
 
 		PageDescriptor *buddy_pointer = buddy_of(*block_pointer, source_order-1);
+		syslog.messagef(LogLevel::DEBUG, "Inserted main at %d, buddy at, %d", *block_pointer, buddy_pointer);
 
 		insert_block(*block_pointer, source_order-1);
 		insert_block(buddy_pointer, source_order-1);
@@ -189,6 +190,7 @@ private:
 		// TODO: Implement this function
 
 		PageDescriptor *buddy_pointer = buddy_of(*block_pointer, source_order);
+
 		remove_block(*block_pointer, source_order);
 		remove_block(buddy_pointer, source_order);
 
@@ -309,7 +311,7 @@ public:
 				}
 			}
 			else if(*slot!=NULL) {
-				split_block(*slot, order);
+				split_block(slot, order);
 				return helper_reserve(order-1, pgd);
 			}
 			else {
