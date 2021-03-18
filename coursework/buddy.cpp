@@ -206,7 +206,7 @@ public:
 	 */
 	PageDescriptor *helper_alloc(int order, int base_order){
 		if (order>=MAX_ORDER){
-			return NULL
+			return NULL;
 		}
 		if(free_pages[order]!=NULL){
 			PageDescriptor **slot = &_free_areas[order];
@@ -265,7 +265,7 @@ public:
 
 	bool helper_reserve(int order, PageDescriptor *pgd){
 		if (order>=MAX_ORDER){
-			return NULL
+			return false;
 		}
 		if(free_pages[order]!=NULL){
 			PageDescriptor **slot = &_free_areas[order];
