@@ -168,7 +168,7 @@ private:
 		insert_block(*block_pointer, source_order-1);
 		insert_block(buddy_pointer, source_order-1);
 
-		// remove_block(*block_pointer, source_order);
+		remove_block(*block_pointer, source_order);
 
 		// dump_state();
 
