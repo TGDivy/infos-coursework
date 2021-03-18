@@ -95,13 +95,19 @@ private:
 		
 		// Iterate whilst there is a slot, and whilst the page descriptor pointer is numerically
 		// greater than what the slot is pointing to.
-		while (*slot && pgd > *slot) {
+		while (&(*slot)->next_free !=NULL) {
 			slot = &(*slot)->next_free;
 		}
+
+		&(*slot)->next_free = pgd;
+
+		// while (*slot && pgd > *slot) {
+		// 	slot = &(*slot)->next_free;
+		// }
 		
 		// Insert the page descriptor into the linked list.
-		pgd->next_free = *slot;
-		*slot = pgd;
+		// pgd->next_free = *slot;
+		// *slot = pgd;
 		
 		// Return the insert point (i.e. slot)
 		return slot;
