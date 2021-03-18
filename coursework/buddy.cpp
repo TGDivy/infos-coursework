@@ -106,9 +106,9 @@ private:
 		}
 		
 		// Insert the page descriptor into the linked list.
-		// *slot->next_free = pgd;
+		(*slot)->next_free = pgd;
 
-		pgd->next_free = *slot;
+		// pgd->next_free = *slot;
 		*slot = pgd;
 		syslog.messagef(LogLevel::DEBUG, "Actually inserting main at %d, %d", pgd->next_free, *slot);
 
