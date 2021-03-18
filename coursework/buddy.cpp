@@ -271,6 +271,7 @@ public:
 
 	bool helper_reserve(int order, PageDescriptor *pgd){
 		syslog.messagef(LogLevel::DEBUG, "What %d", order);
+		dump_state();
 		if (order>=MAX_ORDER){
 			syslog.messagef(LogLevel::DEBUG, "NOOOOOOO %d", order);
 			return false;
