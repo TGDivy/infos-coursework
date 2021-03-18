@@ -127,21 +127,30 @@ private:
 	void remove_block(PageDescriptor *pgd, int order)
 	{
 		// Starting from the _free_area array, iterate until the block has been located in the linked-list.
-		PageDescriptor **slot = &_free_areas[order];
-		syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", *slot, pgd);
+		PageDescriptor *slot = _free_areas[order];
+		syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", slot, pgd);
 
-		while (*slot && pgd != *slot) {
-			slot = &(*slot)->next_free;
-			syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", *slot, pgd);
+		// while (slot && pgd != *slot) {
+		// 	slot = slot->next_free;
+		// 	syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", slot, pgd);
+
+		// }
+		
+		while (slot && slot->next_free!=pgd) {
+			slot = slot->next_free;
+			syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", slot, pgd);
 
 		}
 
-		// Make sure the block actually exists.  Panic the system if it does not.
-		assert(*slot == pgd);
-		
-		// Remove the block from the free list.
-		*slot = pgd->next_free;
+		slot->next_free = pgd->next_free;
 		pgd->next_free = NULL;
+
+		// // Make sure the block actually exists.  Panic the system if it does not.
+		// assert(slot == pgd);
+		
+		// // Remove the block from the free list.
+		// slot = pgd->next_free;
+		// pgd->next_free = NULL;
 	}
 	
 	/**
