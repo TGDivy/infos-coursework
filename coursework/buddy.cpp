@@ -305,6 +305,7 @@ public:
 			pfn_t pfn_slot = sys.mm().pgalloc().pgd_to_pfn(slot);
 			pfn_t pfn_pgd = sys.mm().pgalloc().pgd_to_pfn(pgd);
 			syslog.messagef(LogLevel::DEBUG, "tell meee order %d, %d, %d, %d", order, per_block, pfn_slot, pfn_pgd);
+			syslog.messagef(LogLevel::DEBUG, "slot %d, addres of slot order %d, %d", slot, &slot, _free_areas[order]);
 			while (slot && !(pfn_pgd>=pfn_slot && pfn_pgd<(pfn_slot+per_block))) {
 				slot = slot->next_free;
 				pfn_slot = sys.mm().pgalloc().pgd_to_pfn(slot);
