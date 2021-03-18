@@ -151,7 +151,10 @@ private:
 		
 		// TODO: Implement this function
 
-		PageDescriptor **buddy_pointer = &(buddy_of(*block_pointer, source_order));
+		PageDescriptor *buddy_pointer = buddy_of(*block_pointer, source_order-1);
+
+		assert(is_correct_alignment_for_order(buddy_pointer, source_order-1));
+		assert(is_correct_alignment_for_order(*block_pointer, source_order-1));
 
 		PageDescriptor **block = insert_block(*block_pointer, source_order-1);
 		PageDescriptor **buddy = insert_block(*buddy_pointer, source_order-1);
