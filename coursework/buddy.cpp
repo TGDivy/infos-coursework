@@ -276,9 +276,9 @@ public:
 		if(_free_areas[order]!=NULL){
 			PageDescriptor **slot = &_free_areas[order];
 			PageDescriptor *buddy = buddy_of(*slot, order);
-			per_block = pages_per_block(order);
-			pfn_slot = sys.mm().pgalloc().pgd_to_pfn(*slot);
-			pfn_pgd = sys.mm().pgalloc().pgd_to_pfn(pgd);
+			uint64_t per_block = pages_per_block(order);
+			pfn_t pfn_slot = sys.mm().pgalloc().pgd_to_pfn(*slot);
+			pfn_t pfn_pgd = sys.mm().pgalloc().pgd_to_pfn(pgd);
 
 			while (*slot && pfn_pgd>=pfn_slot && pfn_pgd<(pfn_slot+per_block)) {
 				slot = &(*slot)->next_free;
