@@ -115,7 +115,7 @@ private:
 		
 		
 		// Return the insert point (i.e. slot)
-		return slot;
+		return &slot;
 	}
 	
 	/**
