@@ -106,9 +106,9 @@ private:
 		}
 		
 		// Insert the page descriptor into the linked list.
-		(*slot)->next_free = pgd;
+		// (*slot)->next_free = pgd;
 
-		// pgd->next_free = *slot;
+		pgd->next_free = *slot;
 		*slot = pgd;
 		syslog.messagef(LogLevel::DEBUG, "Actually inserting main at %d, %d", pgd->next_free, *slot);
 
@@ -346,8 +346,13 @@ public:
 		// TODO: Initialise the free area linked list for the maximum order
 		// to initialise the allocation algorithm.
 		// dump_state();
+		int x = pages_per_block(MAX_ORDER-1)%nr_page_descriptors;
 
 		_free_areas[MAX_ORDER-1] = page_descriptors;
+		for(int i =0; i<x;i++){
+			PageDescriptor *p = page_descriptors << 12;
+			insert_block(p, MAX_ORDER-1);
+		}
 		// dump_state();
 		return true;
 	}
