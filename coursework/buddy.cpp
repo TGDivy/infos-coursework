@@ -328,10 +328,10 @@ public:
 		
 		// TODO: Initialise the free area linked list for the maximum order
 		// to initialise the allocation algorithm.
-		dump_state();
+		// dump_state();
 
 		_free_areas[MAX_ORDER-1] = page_descriptors;
-		dump_state();
+		// dump_state();
 		return true;
 	}
 
