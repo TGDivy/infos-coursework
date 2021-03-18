@@ -343,7 +343,7 @@ public:
 	 */
 	bool init(PageDescriptor *page_descriptors, uint64_t nr_page_descriptors) override
 	{
-		mm_log.messagef(LogLevel::DEBUG, "Buddy Allocator Initialising pd=%p, nr=0x%lx", page_descriptors, nr_page_descriptors);
+		mm_log.messagef(LogLevel::DEBUG, "Buddy Allocator Initialising pd=%p, nr=0x%lx, %d", page_descriptors, nr_page_descriptors, page_descriptors[10000]);
 
 		// mm_log.messagef(LogLevel::DEBUG, "Whattt");
 		
