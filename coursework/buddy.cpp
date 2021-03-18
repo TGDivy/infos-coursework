@@ -345,7 +345,7 @@ public:
 	{
 		mm_log.messagef(LogLevel::DEBUG, "Buddy Allocator Initialising pd=%p, nr=0x%lx, %d", page_descriptors, nr_page_descriptors, &page_descriptors[10000]);
 		PageDescriptor *pc = &page_descriptors[10];
-		mm_log.messagef(LogLevel::DEBUG, "0 %d, 100 %d, 10000 %d, -10 %d", &page_descriptors[0], &page_descriptors[100], &page_descriptors[10000, &pc[-10]);
+		mm_log.messagef(LogLevel::DEBUG, "0 %d, 100 %d, 10000 %d, -10 %d", &page_descriptors[0], &page_descriptors[100], &page_descriptors[10000], &pc[-10]);
 
 		// mm_log.messagef(LogLevel::DEBUG, "Whattt");
 		
