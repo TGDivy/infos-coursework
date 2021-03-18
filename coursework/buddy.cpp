@@ -223,6 +223,7 @@ public:
 				return *slot;
 			}
 			else{
+				assert(*slot);
 				split_block(slot, order);
 				return helper_alloc(order-1, base_order);
 			}
@@ -289,6 +290,7 @@ public:
 				return true;
 			}
 			else{
+				assert(*slot);
 				split_block(slot, order);
 				return helper_reserve(order-1, pgd);
 			}
