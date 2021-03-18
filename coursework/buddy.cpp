@@ -108,8 +108,8 @@ private:
 		// Insert the page descriptor into the linked list.
 		// (*slot)->next_free = pgd;
 
-		pgd->next_free = slot;
-		_free_areas[order] = pgd;
+		slot->next_free = pgd;
+		// _free_areas[order] = pgd;
 		return &slot;
 	}
 	
