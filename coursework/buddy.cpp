@@ -369,7 +369,7 @@ public:
 			PageDescriptor *pg = _free_areas[i];
 			while (pg) {
 				// Append the PFN of the free block to the output buffer.
-				snprintf(buffer, sizeof(buffer), "%s%lx ", buffer, sys.mm().pgalloc().pgd_to_pfn(pg));
+				snprintf(buffer, sizeof(buffer), "%s%lx, ", buffer, sys.mm().pgalloc().pgd_to_pfn(pg));
 				pg = pg->next_free;
 			}
 			
