@@ -72,12 +72,12 @@ private:
 		// (3) Calculate the page-frame-number of the buddy of this page.
 		// * If the PFN is aligned to the next order, then the buddy is the next block in THIS order.
 		// * If it's not aligned, then the buddy must be the previous block in THIS order.
-		PageDescriptor *buddy_pfn = is_correct_alignment_for_order(pgd, order + 1) ?
-			&pgd[pages_per_block(order)] : 
-			&pgd[-pages_per_block(order)];
+		uint64_t buddy_pfn = is_correct_alignment_for_order(pgd, order + 1) ?
+			sys.mm().pgalloc().pgd_to_pfn(pgd) + pages_per_block(order) : 
+			sys.mm().pgalloc().pgd_to_pfn(pgd) - pages_per_block(order);
 		
 		// (4) Return the page descriptor associated with the buddy page-frame-number.
-		return buddy_pfn;
+		return sys.mm().pgalloc().pfn_to_pgd(buddy_pfn);
 	}
 	
 	/**
@@ -91,26 +91,20 @@ private:
 	{
 		// Starting from the _free_area array, find the slot in which the page descriptor
 		// should be inserted.
-		PageDescriptor *slot = _free_areas[order];
+		PageDescriptor **slot = &_free_areas[order];
 		
 		// Iterate whilst there is a slot, and whilst the page descriptor pointer is numerically
 		// greater than what the slot is pointing to.
-		// while (&(*slot)->next_free !=NULL) {
-		// 	slot = &(*slot)->next_free;
-		// }
-		// *slot->next_free = pgd;
-		// *slot.next_free = pgd;
-
-		while (slot->next_free == 0) {
-			slot = slot->next_free;
+		while (*slot && pgd > *slot) {
+			slot = &(*slot)->next_free;
 		}
 		
 		// Insert the page descriptor into the linked list.
-		// (*slot)->next_free = pgd;
-
-		slot->next_free = pgd;
-		// _free_areas[order] = pgd;
-		return &slot;
+		pgd->next_free = *slot;
+		*slot = pgd;
+		
+		// Return the insert point (i.e. slot)
+		return slot;
 	}
 	
 	/**
@@ -122,25 +116,21 @@ private:
 	void remove_block(PageDescriptor *pgd, int order)
 	{
 		// Starting from the _free_area array, iterate until the block has been located in the linked-list.
-		PageDescriptor *slot = _free_areas[order];
-		syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", slot, pgd);
+		PageDescriptor **slot = &_free_areas[order];
+		syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", *slot, pgd);
 
-		// while (slot && pgd != *slot) {
-		// 	slot = slot->next_free;
-		// 	syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", slot, pgd);
-
-		// }
-		
-		while (slot && slot!=pgd) {
-			slot = slot->next_free;
-			syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", slot, pgd);
+		while (*slot && pgd != *slot) {
+			slot = &(*slot)->next_free;
+			syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", *slot, pgd);
 
 		}
-		// // Make sure the block actually exists.  Panic the system if it does not.
-		assert(slot == pgd);
 
-		_free_areas[order] = pgd->next_free;
-		pgd->next_free = 0;
+		// Make sure the block actually exists.  Panic the system if it does not.
+		assert(*slot == pgd);
+		
+		// Remove the block from the free list.
+		*slot = pgd->next_free;
+		pgd->next_free = NULL;
 	}
 	
 	/**
@@ -162,16 +152,15 @@ private:
 		// TODO: Implement this function
 
 		PageDescriptor *buddy_pointer = buddy_of(*block_pointer, source_order-1);
-		syslog.messagef(LogLevel::DEBUG, "Inserted main at %d, buddy at, %d", *block_pointer, buddy_pointer);
 
-		insert_block(*block_pointer, source_order-1);
-		insert_block(buddy_pointer, source_order-1);
+		PageDescriptor **block = insert_block(*block_pointer, source_order-1);
+		PageDescriptor **buddy = insert_block(buddy_pointer, source_order-1);
 
-		// remove_block(*block_pointer, source_order);
+		remove_block(*block_pointer, source_order);
 
 		// dump_state();
 
-		return *block_pointer > buddy_pointer ?  buddy_pointer : *block_pointer;
+		return *block > *buddy ? *buddy : *block;
 	}
 	
 	/**
@@ -192,7 +181,6 @@ private:
 		// TODO: Implement this function
 
 		PageDescriptor *buddy_pointer = buddy_of(*block_pointer, source_order);
-
 		remove_block(*block_pointer, source_order);
 		remove_block(buddy_pointer, source_order);
 
@@ -289,32 +277,33 @@ public:
 
 	bool helper_reserve(int order, PageDescriptor *pgd){
 		syslog.messagef(LogLevel::DEBUG, "What %d", order);
-		dump_state();
+		// dump_state();
 		if (order>=MAX_ORDER){
 			syslog.messagef(LogLevel::DEBUG, "NOOOOOOO %d", order);
 			return false;
 		}
 		if(_free_areas[order]!=NULL){
-			PageDescriptor *slot = _free_areas[order];
+			PageDescriptor **slot = &_free_areas[order];
+			// PageDescriptor *buddy = buddy_of(*slot, order);
 			uint64_t per_block = pages_per_block(order);
-			pfn_t pfn_slot = sys.mm().pgalloc().pgd_to_pfn(slot);
+			pfn_t pfn_slot = sys.mm().pgalloc().pgd_to_pfn(*slot);
 			pfn_t pfn_pgd = sys.mm().pgalloc().pgd_to_pfn(pgd);
-			syslog.messagef(LogLevel::DEBUG, "tell meee order %d, %d, %d, %d", order, per_block, pfn_slot, pfn_pgd);
-			syslog.messagef(LogLevel::DEBUG, "slot %d, addres of slot order %d, %d", slot, &slot, _free_areas[order]);
-			while (slot && !(pfn_pgd>=pfn_slot && pfn_pgd<(pfn_slot+per_block))) {
-				slot = slot->next_free;
-				pfn_slot = sys.mm().pgalloc().pgd_to_pfn(slot);
+
+			syslog.messagef(LogLevel::DEBUG, "tell meee %d, %d, %d", per_block, pfn_slot, pfn_pgd);
+			while (*slot && !(pfn_pgd>=pfn_slot && pfn_pgd<(pfn_slot+per_block))) {
+				slot = &(*slot)->next_free;
+				pfn_slot = sys.mm().pgalloc().pgd_to_pfn(*slot);
 				syslog.messagef(LogLevel::DEBUG, "tell meee %d, %d, %d", per_block, pfn_slot, pfn_pgd);
 			}
-			if(slot!=0 && order == 0){
-				if(slot == pgd){
-					remove_block(slot, 0);
+			if(*slot!=NULL && order == 0){
+				if(*slot == pgd){
+					remove_block(*slot, 0);
 					return true;
 				}
 			}
-			else if(slot!=0) {
-				syslog.messagef(LogLevel::DEBUG, "slot %d, addres of slot order %d", slot, &slot);
-				split_block(&slot, order);
+			else if(*slot!=NULL) {
+				assert(*slot);
+				split_block(slot, order);
 				return helper_reserve(order-1, pgd);
 			}
 			else {
@@ -338,28 +327,17 @@ public:
 	 */
 	bool init(PageDescriptor *page_descriptors, uint64_t nr_page_descriptors) override
 	{
-		// mm_log.messagef(LogLevel::DEBUG, "Buddy Allocator Initialising pd=%p, nr=0x%lx, %d", page_descriptors, nr_page_descriptors, &page_descriptors[10000]);
-		// PageDescriptor *pc = &page_descriptors[10];
-		// mm_log.messagef(LogLevel::DEBUG, "0 %d, 100 %d, 10000 %d, -10 %d", &page_descriptors[0], &page_descriptors[100], &page_descriptors[10000], &pc[-10]);
+		// mm_log.messagef(LogLevel::DEBUG, "Buddy Allocator Initialising pd=%p, nr=0x%lx", page_descriptors, nr_page_descriptors);
+		// mm_log.messagef(LogLevel::DEBUG, "Buddy Allocator Initialising pd=%p, nr=0x%lx", page_descriptors, nr_page_descriptors);
 
-		// // mm_log.messagef(LogLevel::DEBUG, "Whattt");
+		// mm_log.messagef(LogLevel::DEBUG, "Whattt");
 		
-		// // TODO: Initialise the free area linked list for the maximum order
-		// // to initialise the allocation algorithm.
-		// // dump_state();
-		// int x = pages_per_block(MAX_ORDER-1)%nr_page_descriptors;
-		// mm_log.messagef(LogLevel::DEBUG, "slot %d, addres of slot order %d", page_descriptors, &page_descriptors);
+		// TODO: Initialise the free area linked list for the maximum order
+		// to initialise the allocation algorithm.
+		// dump_state();
 
-		// int crash =1/0; 
-		// assert(1==0);
-		// assert(1==1);
-
-		for(int i =0; i<int(nr_page_descriptors); i++){
-			(&page_descriptors[i])->next_free = 0;
-		}
-		_free_areas[MAX_ORDER-1] = &page_descriptors[0];
-
-		dump_state();
+		_free_areas[MAX_ORDER-1] = page_descriptors;
+		// dump_state();
 		return true;
 	}
 
@@ -385,7 +363,7 @@ public:
 			PageDescriptor *pg = _free_areas[i];
 			while (pg) {
 				// Append the PFN of the free block to the output buffer.
-				snprintf(buffer, sizeof(buffer), "%s%lx, ", buffer, sys.mm().pgalloc().pgd_to_pfn(pg));
+				snprintf(buffer, sizeof(buffer), "%s%lx ", buffer, sys.mm().pgalloc().pgd_to_pfn(pg));
 				pg = pg->next_free;
 			}
 			
