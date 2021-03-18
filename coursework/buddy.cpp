@@ -152,6 +152,8 @@ private:
 		PageDescriptor **block = insert_block(block_pointer, source_order-1);
 		PageDescriptor **buddy = insert_block(buddy_pointer, source_order-1);
 
+		remove_block(block_pointer, source_order);
+
 		return *block > *buddy ? *buddy : *block;
 	}
 	
@@ -203,25 +205,27 @@ public:
 	 * allocation failed.
 	 */
 	PageDescriptor *helper_alloc(int order, int base_order){
-		if (base_order>=MAX_ORDER){
+		if (order>=MAX_ORDER){
 			return NULL
 		}
 		if(free_pages[order]!=NULL){
 			PageDescriptor **slot = &_free_areas[order];
-			while (*slot && &(*slot)->type != PageDescriptorType::AVAILABLE) {
+			while (&(*slot)->next_free != NULL) {
 				slot = &(*slot)->next_free;
 			}
-			if (slot!=NULL && order==base_order){
+			remove_block(*slot, order);
+			if(order == base_order){
 				return *slot;
 			}
-			else if(slot!=NULL){
-				split_block(slot, order);
-				helper_alloc(order-1, base_order);
-			}
 			else{
-				helper_alloc(order+1, base_order);
+				split_block(slot, order);
+				return helper_alloc(order-1, base_order);
 			}
 		}
+		else {
+			return helper_alloc(order+1, base_order);
+		}
+
 	}
 	
 	PageDescriptor *alloc_pages(int order) override
@@ -258,9 +262,40 @@ public:
 	 * @param pgd The page descriptor of the page to reserve.
 	 * @return Returns TRUE if the reservation was successful, FALSE otherwise.
 	 */
+
+	bool helper_reserve(int order, PageDescriptor *pgd){
+		if (order>=MAX_ORDER){
+			return NULL
+		}
+		if(free_pages[order]!=NULL){
+			PageDescriptor **slot = &_free_areas[order];
+			PageDescriptor *buddy = buddy_of(*slot, order);
+
+			while (*slot && ((*slot<=pgd && buddy>=pgd) || (*slot>=pgd && buddy<=pgd)){
+				slot = &(*slot)->next_free;
+			}
+			if(order == 0){
+				if(*slot == pgd){
+					remove_block(*slot, 0);
+				}
+				else{
+					remove_block(buddy, 0);
+				}
+				return true;
+			}
+			else{
+				split_block(slot, order);
+				return helper_alloc(order-1, pgd);
+			}
+		}
+		else {
+			return helper_alloc(order+1, pgd);
+		}
+	}
+
 	bool reserve_page(PageDescriptor *pgd)
 	{
-		not_implemented();
+		return helper_reserve(0, pgd);
 	}
 	
 	/**
