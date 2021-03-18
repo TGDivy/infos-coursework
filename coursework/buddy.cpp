@@ -150,7 +150,7 @@ private:
 		PageDescriptor *buddy_pointer = buddy_of(*block_pointer, source_order-1);
 
 		PageDescriptor **block = insert_block(*block_pointer, source_order-1);
-		PageDescriptor **buddy = insert_block(*buddy_pointer, source_order-1);
+		PageDescriptor **buddy = insert_block(buddy_pointer, source_order-1);
 
 		remove_block(*block_pointer, source_order);
 
@@ -179,7 +179,12 @@ private:
 		remove_block(buddy_pointer, source_order);
 
 		// Starting from the _free_area array, iterate until the block has been located in the linked-list.
-		PageDescriptor **slot = &_free_areas[order+1];
+		if(_free_areas[source_order+1]!=NULL){
+			PageDescriptor correct = is_correct_alignment_for_order(buddy_pointer, source_order+1) ? buddy_pointer : *block_pointer; 
+			insert_block(correct, source_order+1);
+
+		}
+		PageDescriptor **slot = &_free_areas[source_order+1];
 		while (*slot && (*block_pointer != *slot || buddy_pointer !=*slot)) {
 			slot = &(*slot)->next_free;
 		}
