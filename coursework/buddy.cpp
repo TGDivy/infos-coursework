@@ -348,7 +348,7 @@ public:
 		// dump_state();
 		int x = pages_per_block(MAX_ORDER-1)%nr_page_descriptors;
 
-		_free_areas[MAX_ORDER-1] = *page_descriptors;
+		_free_areas[MAX_ORDER-1] = &page_descriptors;
 		// for(int i =0; i<x;i++){
 		// 	PageDescriptor *p = page_descriptors << 12;
 		// 	insert_block(p, MAX_ORDER-1);
