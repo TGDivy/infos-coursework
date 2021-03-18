@@ -109,7 +109,7 @@ private:
 		// (*slot)->next_free = pgd;
 
 		pgd->next_free = slot;
-		slot = pgd;
+		_free_areas[order] = pgd;
 		syslog.messagef(LogLevel::DEBUG, "Actually inserting main at %d, %d", pgd->next_free, *slot);
 
 		
