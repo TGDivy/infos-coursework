@@ -117,8 +117,12 @@ private:
 	{
 		// Starting from the _free_area array, iterate until the block has been located in the linked-list.
 		PageDescriptor **slot = &_free_areas[order];
+		syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", *slot, pgd);
+
 		while (*slot && pgd != *slot) {
 			slot = &(*slot)->next_free;
+			syslog.messagef(LogLevel::DEBUG, "current %d, remove %d", *slot, pgd);
+
 		}
 
 		// Make sure the block actually exists.  Panic the system if it does not.
