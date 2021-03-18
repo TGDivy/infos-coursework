@@ -101,7 +101,7 @@ private:
 		// *slot->next_free = pgd;
 		// *slot.next_free = pgd;
 
-		while (slot->next_free == -1) {
+		while (slot->next_free == 0) {
 			slot = slot->next_free;
 		}
 		
@@ -140,7 +140,7 @@ private:
 		assert(slot == pgd);
 
 		_free_areas[order] = pgd->next_free;
-		pgd->next_free = -1;
+		pgd->next_free = 0;
 	}
 	
 	/**
@@ -306,13 +306,13 @@ public:
 				pfn_slot = sys.mm().pgalloc().pgd_to_pfn(slot);
 				syslog.messagef(LogLevel::DEBUG, "tell meee %d, %d, %d", per_block, pfn_slot, pfn_pgd);
 			}
-			if(slot!=NULL && order == 0){
+			if(slot!=0 && order == 0){
 				if(slot == pgd){
 					remove_block(slot, 0);
 					return true;
 				}
 			}
-			else if(slot!=NULL) {
+			else if(slot!=0) {
 				syslog.messagef(LogLevel::DEBUG, "slot %d, addres of slot order %d", slot, &slot);
 				split_block(&slot, order);
 				return helper_reserve(order-1, pgd);
@@ -354,10 +354,11 @@ public:
 		// assert(1==0);
 		// assert(1==1);
 
-		_free_areas[MAX_ORDER-1] = &page_descriptors[0];
 		for(int i =0; i<nr_page_descriptors; i++){
 			(&page_descriptors[i])->next_free = -1;
 		}
+		_free_areas[MAX_ORDER-1] = &page_descriptors[0];
+
 		dump_state();
 		return true;
 	}
