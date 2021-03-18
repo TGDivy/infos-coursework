@@ -310,6 +310,7 @@ public:
 		// to initialise the allocation algorithm.
 
 		_free_areas[MAX_ORDER-1] = page_descriptors;
+		return true;
 	}
 
 	/**
