@@ -285,11 +285,11 @@ public:
 			}
 			else{
 				split_block(slot, order);
-				return helper_alloc(order-1, pgd);
+				return helper_reserve(order-1, pgd);
 			}
 		}
 		else {
-			return helper_alloc(order+1, pgd);
+			return helper_reserve(order+1, pgd);
 		}
 	}
 
