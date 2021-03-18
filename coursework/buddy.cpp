@@ -101,7 +101,7 @@ private:
 		// *slot->next_free = pgd;
 		// *slot.next_free = pgd;
 
-		while (slot->next_free == NULL) {
+		while (slot->next_free == -1) {
 			slot = slot->next_free;
 		}
 		
@@ -140,7 +140,7 @@ private:
 		assert(slot == pgd);
 
 		_free_areas[order] = pgd->next_free;
-		pgd->next_free = NULL;
+		pgd->next_free = -1;
 	}
 	
 	/**
@@ -356,7 +356,7 @@ public:
 
 		_free_areas[MAX_ORDER-1] = &page_descriptors[0];
 		for(int i =0; i<nr_page_descriptors; i++){
-			page_descriptors[i].next_free = NULL;
+			page_descriptors[i].next_free = -1;
 		}
 		dump_state();
 		return true;
