@@ -245,7 +245,7 @@ public:
 		// illegal to free page 1 in order-1.
 		assert(is_correct_alignment_for_order(pgd, order));
 		
-		PageDescriptor *buddy_pointer = buddy_of(*block_pointer);
+		PageDescriptor *buddy_pointer = buddy_of(pgd);
 		
 		PageDescriptor **slot = &_free_areas[order];
 		while (*slot && buddy_pointer !=*slot) {
@@ -271,7 +271,7 @@ public:
 			PageDescriptor **slot = &_free_areas[order];
 			PageDescriptor *buddy = buddy_of(*slot, order);
 
-			while (*slot && ((*slot<=pgd && buddy>=pgd) || (*slot>=pgd && buddy<=pgd)){
+			while (*slot && ((*slot<=pgd && buddy>=pgd) || (*slot>=pgd && buddy<=pgd)) ) {
 				slot = &(*slot)->next_free;
 			}
 			if(order == 0){
