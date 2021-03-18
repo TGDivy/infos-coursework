@@ -322,9 +322,11 @@ public:
 	bool init(PageDescriptor *page_descriptors, uint64_t nr_page_descriptors) override
 	{
 		mm_log.messagef(LogLevel::DEBUG, "Buddy Allocator Initialising pd=%p, nr=0x%lx", page_descriptors, nr_page_descriptors);
+		mm_log.messagef(LogLevel::DEBUG, "Whattt");
 		
 		// TODO: Initialise the free area linked list for the maximum order
 		// to initialise the allocation algorithm.
+		dump_state();
 
 		_free_areas[MAX_ORDER-1] = page_descriptors;
 		dump_state();
