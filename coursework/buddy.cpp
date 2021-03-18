@@ -151,11 +151,11 @@ private:
 		
 		// TODO: Implement this function
 
-		PageDescriptor *buddy_pointer = buddy_of(*block_pointer, source_order-1);
+		PageDescriptor **buddy_pointer = &buddy_of(*block_pointer, source_order);
 
 		PageDescriptor **block = insert_block(*block_pointer, source_order-1);
+		PageDescriptor **buddy = insert_block(*buddy_pointer, source_order-1);
 		remove_block(*block_pointer, source_order);
-		PageDescriptor **buddy = insert_block(buddy_pointer, source_order-1);
 
 
 		// dump_state();
