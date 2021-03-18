@@ -355,7 +355,7 @@ public:
 		// assert(1==1);
 
 		for(int i =0; i<nr_page_descriptors; i++){
-			(&page_descriptors[i])->next_free = -1;
+			(&page_descriptors[i])->next_free = 0;
 		}
 		_free_areas[MAX_ORDER-1] = &page_descriptors[0];
 
