@@ -297,10 +297,11 @@ public:
 			}
 			if(*slot!=NULL && order == 0){
 				if(*slot == pgd){
-					remove_block(buddy, 0);
+					remove_block(*slot, 0);
 				}
 				else{
-					remove_block(*slot, 0);
+					remove_block(buddy, 0);
+
 				}
 				return true;
 			}
