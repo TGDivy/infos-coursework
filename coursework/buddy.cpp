@@ -99,7 +99,7 @@ private:
 			slot = &(*slot)->next_free;
 		}
 
-		&(*slot)->next_free = pgd;
+		*slot.next_free = pgd;
 
 		// while (*slot && pgd > *slot) {
 		// 	slot = &(*slot)->next_free;
