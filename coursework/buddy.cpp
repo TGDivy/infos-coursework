@@ -154,6 +154,8 @@ private:
 
 		remove_block(*block_pointer, source_order);
 
+		dump_state();
+
 		return *block > *buddy ? *buddy : *block;
 	}
 	
@@ -300,7 +302,7 @@ public:
 			}
 			else if(*slot!=NULL) {
 				assert(*slot);
-				split_block(slot, order-1);
+				split_block(slot, order);
 				return helper_reserve(order-1, pgd);
 			}
 			else {
