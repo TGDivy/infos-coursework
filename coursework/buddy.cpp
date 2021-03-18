@@ -300,7 +300,7 @@ public:
 			}
 			else if(*slot!=NULL) {
 				assert(*slot);
-				split_block(slot, order+1);
+				split_block(slot, order-1);
 				return helper_reserve(order-1, pgd);
 			}
 			else {
