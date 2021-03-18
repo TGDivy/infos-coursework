@@ -284,7 +284,7 @@ public:
 		}
 		if(_free_areas[order]!=NULL){
 			PageDescriptor **slot = &_free_areas[order];
-			PageDescriptor *buddy = buddy_of(*slot, order);
+			// PageDescriptor *buddy = buddy_of(*slot, order);
 			uint64_t per_block = pages_per_block(order);
 			pfn_t pfn_slot = sys.mm().pgalloc().pgd_to_pfn(*slot);
 			pfn_t pfn_pgd = sys.mm().pgalloc().pgd_to_pfn(pgd);
@@ -298,12 +298,8 @@ public:
 			if(*slot!=NULL && order == 0){
 				if(*slot == pgd){
 					remove_block(*slot, 0);
+					return true;
 				}
-				else{
-					remove_block(buddy, 0);
-
-				}
-				return true;
 			}
 			else if(*slot!=NULL) {
 				assert(*slot);
