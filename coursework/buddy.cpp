@@ -354,6 +354,8 @@ public:
 		syslog.messagef(LogLevel::DEBUG, "slot %d, addres of slot order %d", page_descriptors, &page_descriptors);
 
 		int crash =1/0; 
+		assert(1==0);
+		assert(1==1);
 
 		_free_areas[MAX_ORDER-1] = page_descriptors;
 		// for(int i =0; i<x;i++){
