@@ -157,7 +157,7 @@ private:
 		assert(is_correct_alignment_for_order(*block_pointer, source_order-1));
 
 		PageDescriptor **block = insert_block(*block_pointer, source_order-1);
-		PageDescriptor **buddy = insert_block(*buddy_pointer, source_order-1);
+		PageDescriptor **buddy = insert_block(buddy_pointer, source_order-1);
 		remove_block(*block_pointer, source_order);
 
 
@@ -313,9 +313,7 @@ public:
 				return helper_reserve(order+1, pgd);
 			}
 		}
-		else {
-			return helper_reserve(order+1, pgd);
-		}
+		return helper_reserve(order+1, pgd);
 	}
 
 	bool reserve_page(PageDescriptor *pgd)
