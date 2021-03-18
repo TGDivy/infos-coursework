@@ -316,6 +316,7 @@ public:
 
 	bool reserve_page(PageDescriptor *pgd)
 	{
+		mm_log.messagef(LogLevel::DEBUG, "Calling RESERVE");
 		return helper_reserve(0, pgd);
 	}
 	
