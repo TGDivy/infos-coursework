@@ -180,7 +180,7 @@ private:
 
 		// Starting from the _free_area array, iterate until the block has been located in the linked-list.
 		if(_free_areas[source_order+1]!=NULL){
-			PageDescriptor correct = is_correct_alignment_for_order(buddy_pointer, source_order+1) ? buddy_pointer : *block_pointer; 
+			PageDescriptor *correct = is_correct_alignment_for_order(buddy_pointer, source_order+1) ? buddy_pointer : *block_pointer; 
 			insert_block(correct, source_order+1);
 
 		}
@@ -250,7 +250,7 @@ public:
 		// illegal to free page 1 in order-1.
 		assert(is_correct_alignment_for_order(pgd, order));
 		
-		PageDescriptor *buddy_pointer = buddy_of(pgd);
+		PageDescriptor *buddy_pointer = buddy_of(pgd, order);
 		
 		PageDescriptor **slot = &_free_areas[order];
 		while (*slot && buddy_pointer !=*slot) {
