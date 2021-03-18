@@ -106,10 +106,10 @@ private:
 		}
 		
 		// Insert the page descriptor into the linked list.
-		*slot->next_free = pgd;
+		// *slot->next_free = pgd;
 
-		// pgd->next_free = *slot;
-		// *slot = pgd;
+		pgd->next_free = *slot;
+		*slot = pgd;
 		
 		// Return the insert point (i.e. slot)
 		return slot;
