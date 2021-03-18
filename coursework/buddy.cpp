@@ -101,7 +101,7 @@ private:
 		// *slot->next_free = pgd;
 		// *slot.next_free = pgd;
 
-		while (slot && pgd > slot) {
+		while (slot->next_free == NULL) {
 			slot = slot->next_free;
 		}
 		
@@ -110,11 +110,6 @@ private:
 
 		pgd->next_free = slot;
 		_free_areas[order] = pgd;
-		syslog.messagef(LogLevel::DEBUG, "Actually inserting main at %d, %d", pgd->next_free, *slot);
-
-		
-		
-		// Return the insert point (i.e. slot)
 		return &slot;
 	}
 	
@@ -360,11 +355,11 @@ public:
 		// assert(1==1);
 
 		_free_areas[MAX_ORDER-1] = &page_descriptors[0];
-		// for(int i =0; i<x;i++){
-		// 	PageDescriptor *p = page_descriptors << 12;
-		// 	insert_block(p, MAX_ORDER-1);
-		// }
-		// dump_state();
+		for(int i =0; i<nr_page_descriptors; i++){
+			page_descriptors[i].next_free = NULL;
+			insert_block(p, MAX_ORDER-1);
+		}
+		dump_state();
 		return true;
 	}
 
