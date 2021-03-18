@@ -280,7 +280,7 @@ public:
 			while (*slot && ((*slot<=pgd && buddy>=pgd) || (*slot>=pgd && buddy<=pgd)) ) {
 				slot = &(*slot)->next_free;
 			}
-			if(slot!=NULL && order == 0){
+			if(*slot!=NULL && order == 0){
 				if(*slot == pgd){
 					remove_block(*slot, 0);
 				}
@@ -289,7 +289,7 @@ public:
 				}
 				return true;
 			}
-			else if(slot!=NULL) {
+			else if(*slot!=NULL) {
 				assert(*slot);
 				split_block(slot, order);
 				return helper_reserve(order-1, pgd);
