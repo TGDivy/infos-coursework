@@ -158,7 +158,7 @@ private:
 
 		PageDescriptor **block = insert_block(*block_pointer, source_order-1);
 		PageDescriptor **buddy = insert_block(buddy_pointer, source_order-1);
-		remove_block(*block_pointer, source_order);
+		remove_block(*block_pointer, source_order+1);
 
 
 		// dump_state();
