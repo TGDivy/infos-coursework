@@ -158,7 +158,7 @@ private:
 
 		PageDescriptor **block = insert_block(*block_pointer, source_order-1);
 		PageDescriptor **buddy = insert_block(buddy_pointer, source_order-1);
-		remove_block(*block_pointer, source_order+1);
+		remove_block(*block_pointer, source_order);
 
 
 		// dump_state();
@@ -298,11 +298,9 @@ public:
 				pfn_slot = sys.mm().pgalloc().pgd_to_pfn(*slot);
 				syslog.messagef(LogLevel::DEBUG, "tell meee %d, %d, %d", per_block, pfn_slot, pfn_pgd);
 			}
-			if(*slot!=NULL && order == 0){
-				if(*slot == pgd){
+			if(*slot!=NULL && order == 0 && *slot == pgd){
 					remove_block(*slot, 0);
 					return true;
-				}
 			}
 			else if(*slot!=NULL) {
 				assert(*slot);
