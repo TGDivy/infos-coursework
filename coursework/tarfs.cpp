@@ -4,7 +4,7 @@
  */
 
 /*
- * STUDENT NUMBER: s
+ * STUDENT NUMBER: s1885517
  */
 #include "tarfs.h"
 #include <infos/kernel/log.h>
@@ -60,7 +60,23 @@ static inline unsigned int octal2ui(const char *data)
 // in the TAR file format description.
 namespace tarfs {
 	struct posix_header {
-		// TO BE FILLED IN
+	 	char name[100];               /*   0 */
+		char mode[8];                 /* 100 */
+		char uid[8];                  /* 108 */
+		char gid[8];                  /* 116 */
+		char size[12];                /* 124 */
+		char mtime[12];               /* 136 */
+		char chksum[8];               /* 148 */
+		char typeflag;                /* 156 */
+		char linkname[100];           /* 157 */
+		char magic[6];                /* 257 */
+		char version[2];              /* 263 */
+		char uname[32];               /* 265 */
+		char gname[32];               /* 297 */
+		char devmajor[8];             /* 329 */
+		char devminor[8];             /* 337 */
+		char prefix[155];             /* 345 */
+                                /* 500 */
 	} __packed;
 }
 
@@ -73,15 +89,36 @@ namespace tarfs {
  */
 int TarFSFile::pread(void* buffer, size_t size, off_t off)
 {
-	if (off >= this->size()) return 0;
-
-	// TO BE FILLED IN
-	
 	// buffer is a pointer to the buffer that should receive the data.
 	// size is the amount of data to read from the file.
 	// off is the zero-based offset within the file to start reading from.
+
+	// Nothing present to read.	
+	if (off >= this->size()) return 0;
+
+	block_device = _owner.block_device();
+
+	// Read the entire file in file_buffer.
+	int block_size = _owner.block_size();
+	int file_size = this->size(); // in bytes.
+	int blocks_to_read = ((file_size-1) / block_size) + 1;
+	uint8_t *file_buffer = new uint8_t[block_size * blocks_to_read];
+
+	block_device.read_blocks(file_buffer, _file_start_block, nr_blocks);
+
 	
-	return 0;
+	//Find out how many bytes we can read in.
+	int bytes_that_can_be_read;
+	if(file_size-off<size)
+		bytes_that_can_be_read = file_size-off;
+	else
+		bytes_that_can_be_read = size;
+
+	//Read the requested information from the file into the buffer.
+	memcpy(buffer, file_buffer+off, bytes_that_can_be_read);
+	delete file_buffer;
+
+	return bytes_that_can_be_read;
 }
 
 /**
@@ -106,8 +143,7 @@ TarFSNode* TarFS::build_tree()
  */
 unsigned int TarFSFile::size() const
 {
-	// TO BE FILLED IN
-	return 0;
+	return octal2ui(_hdr->size);
 }
 
 /* --- YOU DO NOT NEED TO CHANGE ANYTHING BELOW THIS LINE --- */
