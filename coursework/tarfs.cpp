@@ -139,7 +139,9 @@ TarFSNode* TarFS::build_tree()
 
 	size_t off = 0;
 	while (off< nr_blocks){ 
-		
+		syslog.messagef(LogLevel::DEBUG, "offset is %d",  off);
+
+
 		block_device().read_blocks(hdr, off, 1);
 		List<String> sname = ((String)(hdr->name)).split('/', true);
 		
