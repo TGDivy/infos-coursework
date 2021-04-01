@@ -157,6 +157,8 @@ TarFSNode* TarFS::build_tree()
 		// root->add_child(name, child);
 
 		off+=block_offset+1;
+		syslog.messagef(LogLevel::DEBUG, "offset is %d",  off);
+
 	}
 	
 	return root;
