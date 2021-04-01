@@ -148,7 +148,7 @@ TarFSNode* TarFS::build_tree()
 		TarFSNode *parent = root;
 		while(sname.count()>1){
 			name = sname.pop();
-			parent = parent.get_child(name);
+			parent = parent->get_child(name);
 		}
 		name = sname.pop();
 		
