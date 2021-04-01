@@ -141,23 +141,27 @@ TarFSNode* TarFS::build_tree()
 	while (off< nr_blocks){ 
 		syslog.messagef(LogLevel::DEBUG, "offset is %d",  off);
 
-
 		block_device().read_blocks(hdr, off, 1);
-		List<String> sname = ((String)(hdr->name)).split('/', true);
+
+		List<String> sname = ((String)(hdr->name)).split('/', true);		
+		String name;
+		TarFSNode *parent = root;
+		while(sname.count()>1){
+			name = sname.pop();
+			parent = parent.get_child(name);
+		}
+		name = sname.pop();
 		
-		String name = sname.pop();
 		syslog.messagef(LogLevel::DEBUG, "%s",  name.c_str());
 
-		TarFSNode *child = new TarFSNode(root, name , *this);
+		TarFSNode *child = new TarFSNode(parent, name, *this);
 
 		size_t block_offset = ((octal2ui(hdr->size)-1)/block_device().block_size()) +1;
 		if(octal2ui(hdr->size)==0)
 			block_offset=0;
 		child->set_block_offset(block_offset);
-		root->add_child(name, child);
-
+		parent->add_child(name, child);
 		off+=block_offset+1;
-		syslog.messagef(LogLevel::DEBUG, "offset is %d",  off);
 
 	}
 	
