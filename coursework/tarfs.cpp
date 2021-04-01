@@ -89,8 +89,6 @@ namespace tarfs {
  */
 int TarFSFile::pread(void* buffer, size_t size, off_t off)
 {
-	syslog.messagef(LogLevel::DEBUG, "Start");
-
 	// buffer is a pointer to the buffer that should receive the data.
 	// size is the amount of data to read from the file.
 	// off is the zero-based offset within the file to start reading from.
@@ -119,7 +117,6 @@ int TarFSFile::pread(void* buffer, size_t size, off_t off)
 	//Read the requested information from the file into the buffer.
 	memcpy(buffer, file_buffer+off, bytes_that_can_be_read);
 	delete file_buffer;
-	syslog.messagef(LogLevel::DEBUG, "stop");
 
 	return bytes_that_can_be_read;
 }
@@ -146,9 +143,9 @@ TarFSNode* TarFS::build_tree()
 	while (off< nr_blocks){
 		syslog.messagef(LogLevel::DEBUG, "offset is %d",  off);
 
-		block_device().read_blocks(hdr, off, 1);
+		// block_device().read_blocks(hdr, off, 1);
 		block_device().read_blocks(fileheader_buffer, off, 1);
-
+		hdr = (struct posix_header) fileheader_buffer;
 		if(is_zero_block(fileheader_buffer)){
 			off+=1;
 			continue;
@@ -163,7 +160,7 @@ TarFSNode* TarFS::build_tree()
 		}
 		name = sname.pop();
 		
-		syslog.messagef(LogLevel::DEBUG, "%s",  name.c_str());
+		syslog.messagef(LogLevel::DEBUG, "name is %s",  name.c_str());
 
 		TarFSNode *child = new TarFSNode(parent, name, *this);
 
@@ -172,15 +169,11 @@ TarFSNode* TarFS::build_tree()
 			block_offset=0;
 		child->set_block_offset(off);
 		child->size(octal2ui(hdr->size));
-		// if(hdr->typeflag=='5')
-		// 	child->opendir();
-		// else
-		// 	child->open();
 
 		parent->add_child(name, child);
 		off+=block_offset+1;
-
 	}
+
 	syslog.messagef(LogLevel::DEBUG, "Loop COMPLETE");
 	
 	return root;
