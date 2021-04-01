@@ -138,10 +138,16 @@ TarFSNode* TarFS::build_tree()
 	struct posix_header *hdr = (struct posix_header *) new char[block_device().block_size()];
 
 	size_t off = 0;
-	while (off< nr_blocks){ 
+	while (off< nr_blocks){
 		syslog.messagef(LogLevel::DEBUG, "offset is %d",  off);
 
 		block_device().read_blocks(hdr, off, 1);
+
+		if(is_zero_block(hdr)){
+			off+=1;
+			continue;
+		}
+			
 
 		List<String> sname = ((String)(hdr->name)).split('/', true);		
 		String name;
