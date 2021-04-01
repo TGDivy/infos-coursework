@@ -146,10 +146,14 @@ TarFSNode* TarFS::build_tree()
 		String name = sname.pop();
 
 		TarFSNode *child = new TarFSNode(root, name , *this);
-		child.set_block_offset(octal2ui(hdr->size));
+
+		size_t block_offset = octal2ui(hdr->size)-1/block_device().block_size() +1;
+		if(octal2ui(hdr->size)==0)
+			block_offset=0;
+		child.set_block_offset();
 		root->add_child(name, child);
 
-		off+=octal2ui(hdr->size);
+		off+=block_offset+1;
 	}
 	
 	return root;
