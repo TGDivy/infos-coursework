@@ -96,15 +96,15 @@ int TarFSFile::pread(void* buffer, size_t size, off_t off)
 	// Nothing present to read.	
 	if (off >= this->size()) return 0;
 
-	block_device = _owner.block_device();
+	infos::drivers::block::BlockDevice& block_device = _owner.block_device();
 
 	// Read the entire file in file_buffer.
-	int block_size = _owner.block_size();
+	int block_size = block_device.block_size();
 	int file_size = this->size(); // in bytes.
 	int blocks_to_read = ((file_size-1) / block_size) + 1;
 	uint8_t *file_buffer = new uint8_t[block_size * blocks_to_read];
 
-	block_device.read_blocks(file_buffer, _file_start_block, nr_blocks);
+	block_device.read_blocks(file_buffer, _file_start_block, blocks_to_read);
 
 	
 	//Find out how many bytes we can read in.
@@ -135,14 +135,22 @@ TarFSNode* TarFS::build_tree()
 	size_t nr_blocks = block_device().block_count();
 	syslog.messagef(LogLevel::DEBUG, "Block Device nr-blocks=%lu", nr_blocks);
 
-	int off = 0;
-	while (off< nr_blocks){
-		TarFSFile* file = new TarFSFile(*this, off);
-		hdr = file->hdr;
-		infos::util::String& name = hdr->name;
-		TarFSNode *child = new TarFSNode(root, name, *this);
-		child.set_block_offset(off);
-		add_child(name, child);
+	int block_size = block_device().block_size();
+	struct posix_header *hdr = (struct posix_header *) new char[_owner.block_device().block_size()];
+
+	size_t off = 0;
+	while (off< nr_blocks){ 
+		
+		block_device().read_blocks(hdr, off, 1);
+		List<String> sname = (hdr->name).split('/', true);
+		
+		String name = sname.pop()
+
+		TarFSNode *child = new TarFSNode(root,name , *this);
+		child.set_block_offset(octal2ui(hdr->size));
+		root.add_child(name, child);
+
+		off+=octal2ui(_hdr->size);
 	}
 	
 	return root;
