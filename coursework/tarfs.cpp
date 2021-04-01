@@ -185,6 +185,7 @@ TarFSNode* TarFS::build_tree()
  */
 unsigned int TarFSFile::size() const
 {
+	syslog.messagef(LogLevel::DEBUG, "Side %d", octal2ui(_hdr->size));
 	return octal2ui(_hdr->size);
 }
 
