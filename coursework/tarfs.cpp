@@ -169,6 +169,7 @@ TarFSNode* TarFS::build_tree()
 		if(octal2ui(hdr->size)==0)
 			block_offset=0;
 		child->set_block_offset(off);
+		child->size(octal2ui(hdr->size));
 		// if(hdr->typeflag=='5')
 		// 	child->opendir();
 		// else
