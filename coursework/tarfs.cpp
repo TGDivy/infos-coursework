@@ -137,13 +137,16 @@ TarFSNode* TarFS::build_tree()
 
 	struct posix_header *hdr = (struct posix_header *) new char[block_device().block_size()];
 
+	uint8_t *fileheader_buffer = new uint8_t[block_device().block_size()];
+
 	size_t off = 0;
 	while (off< nr_blocks){
 		syslog.messagef(LogLevel::DEBUG, "offset is %d",  off);
 
 		block_device().read_blocks(hdr, off, 1);
+		block_device().read_blocks(fileheader_buffer, off, 1);
 
-		if(is_zero_block(hdr)){
+		if(is_zero_block(fileheader_buffer)){
 			off+=1;
 			continue;
 		}
