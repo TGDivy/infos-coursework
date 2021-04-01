@@ -143,9 +143,9 @@ TarFSNode* TarFS::build_tree()
 	while (off< nr_blocks){
 		syslog.messagef(LogLevel::DEBUG, "offset is %d",  off);
 
-		// block_device().read_blocks(hdr, off, 1);
+		block_device().read_blocks(hdr, off, 1);
 		block_device().read_blocks(fileheader_buffer, off, 1);
-		hdr = (struct posix_header) fileheader_buffer;
+
 		if(is_zero_block(fileheader_buffer)){
 			off+=1;
 			continue;
@@ -173,7 +173,6 @@ TarFSNode* TarFS::build_tree()
 		parent->add_child(name, child);
 		off+=block_offset+1;
 	}
-
 	syslog.messagef(LogLevel::DEBUG, "Loop COMPLETE");
 	
 	return root;
