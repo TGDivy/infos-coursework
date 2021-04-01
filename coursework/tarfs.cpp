@@ -142,7 +142,7 @@ TarFSNode* TarFS::build_tree()
 		syslog.messagef(LogLevel::DEBUG, "offset is %d",  off);
 
 
-		// block_device().read_blocks(hdr, off, 1);
+		block_device().read_blocks(hdr, off, 1);
 		// List<String> sname = ((String)(hdr->name)).split('/', true);
 		
 		// String name = sname.pop();
@@ -150,13 +150,13 @@ TarFSNode* TarFS::build_tree()
 
 		// TarFSNode *child = new TarFSNode(root, name , *this);
 
-		// size_t block_offset = octal2ui(hdr->size)-1/block_device().block_size() +1;
-		// if(octal2ui(hdr->size)==0)
-		// 	block_offset=0;
+		size_t block_offset = octal2ui(hdr->size)-1/block_device().block_size() +1;
+		if(octal2ui(hdr->size)==0)
+			block_offset=0;
 		// child->set_block_offset(block_offset);
 		// root->add_child(name, child);
 
-		// off+=block_offset+1;
+		off+=block_offset+1;
 	}
 	
 	return root;
