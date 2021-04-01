@@ -133,12 +133,14 @@ TarFSNode* TarFS::build_tree()
 	// You must read the TAR file, and build a tree of TarFSNodes that represents each file present in the archive.
 	
 	size_t nr_blocks = block_device().block_count();
+	size_t block_size = block_device().block_size();
 	syslog.messagef(LogLevel::DEBUG, "Block Device nr-blocks=%lu", nr_blocks);
 
-	struct posix_header *hdr = (struct posix_header *) new char[block_device().block_size()];
+	// Reading header.
+	struct posix_header *hdr = (struct posix_header *) new char[block_size];
+	uint8_t *fileheader_buffer = new uint8_t[block_size];
 
-	uint8_t *fileheader_buffer = new uint8_t[block_device().block_size()];
-
+	// off = offset the position of the current header
 	size_t off = 0;
 	while (off< nr_blocks){
 		syslog.messagef(LogLevel::DEBUG, "offset is %d",  off);
@@ -146,11 +148,12 @@ TarFSNode* TarFS::build_tree()
 		block_device().read_blocks(hdr, off, 1);
 		block_device().read_blocks(fileheader_buffer, off, 1);
 
-		if(is_zero_block(fileheader_buffer)){
+		if(is_zero_block(fileheader_buffer)){ //if a zero block skip.
 			off+=1;
 			continue;
 		}
-			
+
+		// Find the parent and create the child.
 		List<String> sname = ((String)(hdr->name)).split('/', true);		
 		String name;
 		TarFSNode *parent = root;
@@ -158,20 +161,19 @@ TarFSNode* TarFS::build_tree()
 			name = sname.pop();
 			parent =  parent->get_child(name);
 		}
-		name = sname.pop();
-		
-		syslog.messagef(LogLevel::DEBUG, "name is %s",  name.c_str());
+		name = sname.pop(); // Name of the new child.
+		syslog.messagef(LogLevel::DEBUG, "name is %s", name.c_str());
 
+		// Create the child and set it's properties.
 		TarFSNode *child = new TarFSNode(parent, name, *this);
-
-		size_t block_offset = ((octal2ui(hdr->size)-1)/block_device().block_size()) +1;
-		if(octal2ui(hdr->size)==0)
-			block_offset=0;
 		child->set_block_offset(off);
-		child->size(octal2ui(hdr->size));
-
+		size_t filesize = octal2ui(hdr->size); 
+		child->size(filesize);
+		// Add child to parent.
 		parent->add_child(name, child);
-		off+=block_offset+1;
+
+		// calculate next block position.
+		off += filesize==0 ? 1 : (filesize-1)/block_size) +1;
 	}
 	syslog.messagef(LogLevel::DEBUG, "Loop COMPLETE");
 	
