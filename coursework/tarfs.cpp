@@ -159,7 +159,7 @@ TarFSNode* TarFS::build_tree()
 		size_t block_offset = ((octal2ui(hdr->size)-1)/block_device().block_size()) +1;
 		if(octal2ui(hdr->size)==0)
 			block_offset=0;
-		child->set_block_offset(block_offset);
+		child->set_block_offset(off);
 		parent->add_child(name, child);
 		off+=block_offset+1;
 
