@@ -89,6 +89,8 @@ namespace tarfs {
  */
 int TarFSFile::pread(void* buffer, size_t size, off_t off)
 {
+	syslog.messagef(LogLevel::DEBUG, "Start");
+
 	// buffer is a pointer to the buffer that should receive the data.
 	// size is the amount of data to read from the file.
 	// off is the zero-based offset within the file to start reading from.
@@ -117,6 +119,7 @@ int TarFSFile::pread(void* buffer, size_t size, off_t off)
 	//Read the requested information from the file into the buffer.
 	memcpy(buffer, file_buffer+off, bytes_that_can_be_read);
 	delete file_buffer;
+	syslog.messagef(LogLevel::DEBUG, "stop");
 
 	return bytes_that_can_be_read;
 }
@@ -151,7 +154,6 @@ TarFSNode* TarFS::build_tree()
 			continue;
 		}
 			
-
 		List<String> sname = ((String)(hdr->name)).split('/', true);		
 		String name;
 		TarFSNode *parent = root;
