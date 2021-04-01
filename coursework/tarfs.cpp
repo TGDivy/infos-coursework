@@ -311,7 +311,7 @@ Directory* TarFSNode::opendir()
  * @param name
  * @return 
  */
-PFSNode* TarFSNode::get_child(const String& name)
+TarFSNode* TarFSNode::get_child(const String& name)
 {
 	TarFSNode *child;
 

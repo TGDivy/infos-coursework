@@ -106,7 +106,7 @@ namespace tarfs {
 		infos::fs::File* open() override;
 		infos::fs::Directory* opendir() override;
 
-		PFSNode* get_child(const infos::util::String& name) override;
+		TarFSNode* get_child(const infos::util::String& name) override;
 
 		PFSNode* mkdir(const infos::util::String& name) override;
 
