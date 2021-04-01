@@ -130,11 +130,21 @@ TarFSNode* TarFS::build_tree()
 {
 	// Create the root node.
 	TarFSNode *root = new TarFSNode(NULL, "", *this);
-
-	// TO BE FILLED IN
-	
 	// You must read the TAR file, and build a tree of TarFSNodes that represents each file present in the archive.
+	
+	size_t nr_blocks = block_device().block_count();
+	syslog.messagef(LogLevel::DEBUG, "Block Device nr-blocks=%lu", nr_blocks);
 
+	int off = 0;
+	while (off< nr_blocks){
+		TarFSFile* file = new TarFSFile(*this, off);
+		hdr = file->hdr;
+		infos::util::String& name = hdr->name;
+		TarFSNode *child = new TarFSNode(root, name, *this);
+		child.set_block_offset(off);
+		add_child(name, child);
+	}
+	
 	return root;
 }
 
