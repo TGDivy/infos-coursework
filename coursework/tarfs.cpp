@@ -160,6 +160,11 @@ TarFSNode* TarFS::build_tree()
 		if(octal2ui(hdr->size)==0)
 			block_offset=0;
 		child->set_block_offset(off);
+		if(hdr->typeflag=='5')
+			child->opendir();
+		else
+			child->open();
+
 		parent->add_child(name, child);
 		off+=block_offset+1;
 
