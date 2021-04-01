@@ -143,7 +143,7 @@ TarFSNode* TarFS::build_tree()
 		block_device().read_blocks(hdr, off, 1);
 		List<String> sname = ((String)(hdr->name)).split('/', true);
 		
-		String name = sname.pop()
+		String name = sname.pop();
 
 		TarFSNode *child = new TarFSNode(root, name , *this);
 		child.set_block_offset(octal2ui(hdr->size));
