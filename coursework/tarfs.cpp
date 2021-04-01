@@ -135,22 +135,21 @@ TarFSNode* TarFS::build_tree()
 	size_t nr_blocks = block_device().block_count();
 	syslog.messagef(LogLevel::DEBUG, "Block Device nr-blocks=%lu", nr_blocks);
 
-	int block_size = block_device().block_size();
-	struct posix_header *hdr = (struct posix_header *) new char[_owner.block_device().block_size()];
+	struct posix_header *hdr = (struct posix_header *) new char[block_device().block_size()];
 
 	size_t off = 0;
 	while (off< nr_blocks){ 
 		
 		block_device().read_blocks(hdr, off, 1);
-		List<String> sname = (hdr->name).split('/', true);
+		List<String> sname = ((String)(hdr->name)).split('/', true);
 		
 		String name = sname.pop()
 
-		TarFSNode *child = new TarFSNode(root,name , *this);
+		TarFSNode *child = new TarFSNode(root, name , *this);
 		child.set_block_offset(octal2ui(hdr->size));
-		root.add_child(name, child);
+		root->add_child(name, child);
 
-		off+=octal2ui(_hdr->size);
+		off+=octal2ui(hdr->size);
 	}
 	
 	return root;
