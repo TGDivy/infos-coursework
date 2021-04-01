@@ -169,6 +169,7 @@ TarFSNode* TarFS::build_tree()
 		off+=block_offset+1;
 
 	}
+	syslog.messagef(LogLevel::DEBUG, "Loop COMPLETE");
 	
 	return root;
 }
