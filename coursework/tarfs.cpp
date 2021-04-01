@@ -144,7 +144,7 @@ TarFSNode* TarFS::build_tree()
 		List<String> sname = ((String)(hdr->name)).split('/', true);
 		
 		String name = sname.pop();
-		syslog.messagef(LogLevel::DEBUG, "%s",  name.c_str())
+		syslog.messagef(LogLevel::DEBUG, "%s",  name.c_str());
 
 		TarFSNode *child = new TarFSNode(root, name , *this);
 
