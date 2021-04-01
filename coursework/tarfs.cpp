@@ -173,7 +173,7 @@ TarFSNode* TarFS::build_tree()
 		parent->add_child(name, child);
 
 		// calculate next block position.
-		off += filesize==0 ? 1 : (filesize-1)/block_size) +1;
+		off += filesize==0 ? 1 : ((filesize-1)/block_size) +1;
 	}
 	syslog.messagef(LogLevel::DEBUG, "Loop COMPLETE");
 	
